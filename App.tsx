@@ -36,7 +36,14 @@ const App: React.FC = () => {
   const generateAIBackground = async (fileName: string) => {
     setIsGeneratingBg(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+      if (!apiKey || apiKey === 'PLACEHOLDER_API_KEY') {
+        console.warn("No valid Gemini API key found, skipping AI background generation");
+        setIsGeneratingBg(false);
+        return;
+      }
+      
+      const ai = new GoogleGenAI(apiKey);
       const prompt = `A beautiful, cute, and minimalist traditional Chinese ink painting background for a music game. 
       Theme is inspired by the title: "${fileName.replace(/\.[^/.]+$/, "")}". 
       Style: "Cute Diffuse" with soft gradients. 

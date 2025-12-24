@@ -1,20 +1,84 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 京韵鼓神 - 京剧节奏游戏
 
-# Run and deploy your AI Studio app
+一个结合中国传统文化与现代交互技术的音乐节奏游戏，使用手势控制切击音符，体验京剧与电子音乐的融合。
 
-This contains everything you need to run your app locally.
+## 🎮 游戏特色
 
-View your app in AI Studio: https://ai.studio/apps/drive/1nytZXK3iDwDMEvpoc0KeWpJ9E_uFFBf9
+- **手势识别控制**: 使用MediaPipe技术进行实时手势识别
+- **3D视觉效果**: 基于Three.js的炫酷3D场景和特效
+- **京剧文化元素**: 融合传统京剧音乐与现代电子节奏
+- **响应式设计**: 支持PC和移动设备
 
-## Run Locally
+## 🚀 快速开始
 
-**Prerequisites:**  Node.js
+### 本地运行
 
+**前置要求:** Node.js 18+ 
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. 安装依赖:
+   ```bash
+   npm install
+   ```
+
+2. 设置环境变量:
+   创建`.env.local`文件并添加你的Gemini API密钥:
+   ```
+   GEMINI_API_KEY=你的API密钥
+   ```
+
+3. 启动开发服务器:
+   ```bash
+   npm run dev
+   ```
+
+4. 打开浏览器访问: http://localhost:3000
+
+## 🌐 部署到GitHub Pages
+
+本项目已配置自动部署到GitHub Pages。
+
+### 部署步骤
+
+1. 将代码推送到GitHub仓库
+2. 在仓库设置中启用GitHub Pages:
+   - 进入Settings > Pages
+   - 选择Source为"GitHub Actions"
+3. 添加GEMINI_API_KEY到Repository Secrets:
+   - 进入Settings > Secrets and variables > Actions
+   - 点击"New repository secret"
+   - 添加`GEMINI_API_KEY`和你的API密钥
+4. 推送代码到main分支将自动触发部署
+
+部署完成后，游戏将通过以下URL访问:
+```
+https://你的用户名.github.io/jingyun-tempo-strike/
+```
+
+### 手动构建
+
+如需手动构建和测试:
+```bash
+npm run build    # 构建生产版本
+npm run preview  # 预览构建结果
+```
+
+## 🎯 游戏玩法
+
+1. 允许浏览器访问摄像头(用于手势识别)
+2. 使用手势控制虚拟光剑
+3. 随着音乐节奏切击飞来的音符
+4. 获得高分，感受京剧与现代音乐的碰撞
+
+## 🛠️ 技术栈
+
+- **前端框架**: React 18.3.1 + TypeScript
+- **3D渲染**: Three.js + @react-three/fiber
+- **手势识别**: MediaPipe Tasks Vision
+- **AI集成**: Google Generative AI
+- **UI/样式**: Tailwind CSS
+- **构建工具**: Vite
+- **部署**: GitHub Pages + GitHub Actions
+
+## 📄 许可证
+
+MIT License
