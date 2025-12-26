@@ -39,6 +39,7 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
 
   useEffect(() => {
     let isActive = true;
+    let stream: MediaStream | null = null;
 
     const setupMediaPipe = async () => {
       try {
@@ -69,15 +70,15 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
         await startCamera();
       } catch (err: any) {
         if (isActive) {
-          console.error("Error initializing MediaPipe:", err);
-          setError(`Failed to load hand tracking: ${err.message}`);
+          console.error("MediaPipe Initialization failed:", err);
+          setError(`追踪器启动失败: ${err.message || "请检查网络"} (建议刷新页面)`);
         }
       }
     };
 
     const startCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: 'user',
             width: { ideal: 640 },
@@ -94,10 +95,10 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
              }
           };
         }
-      } catch (err) {
+      } catch (err: any) {
         if (isActive) {
-          console.error("Camera Error:", err);
-          setError("Could not access camera.");
+          console.error("Camera access failed:", err);
+          setError("无法访问摄像头，请授予权限并重试。");
         }
       }
     };
@@ -113,7 +114,7 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
                  lastResultsRef.current = results;
                  processResults(results);
              } catch (e) {
-                 // Non-fatal error
+                 // Ignore occasional frame errors
              }
         }
         requestRef.current = requestAnimationFrame(predictWebcam);
@@ -183,10 +184,13 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
       }
       if (landmarkerRef.current) {
           landmarkerRef.current.close();
+          landmarkerRef.current = null;
       }
-      if (videoRef.current && videoRef.current.srcObject) {
-          const stream = videoRef.current.srcObject as MediaStream;
+      if (stream) {
           stream.getTracks().forEach(t => t.stop());
+      }
+      if (videoRef.current) {
+          videoRef.current.srcObject = null;
       }
     };
   }, [videoRef]);

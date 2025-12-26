@@ -30,35 +30,41 @@ const App: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
-  const { isCameraReady, handPositionsRef, lastResultsRef } = useMediaPipe(videoRef);
+  const { isCameraReady, handPositionsRef, lastResultsRef, error: mpError } = useMediaPipe(videoRef);
 
-  const generateAIBackground = async (fileName: string) => {
+  const generateAIBackgroundWithRetry = async (fileName: string, retries = 2) => {
     setIsGeneratingBg(true);
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `A beautiful, cute, and minimalist traditional Chinese ink painting background for a music game. 
-      Theme is inspired by the title: "${fileName.replace(/\.[^/.]+$/, "")}". 
-      Style: "Cute Diffuse" with soft gradients. 
-      Colors: Traditional Zhu Red and Stone Cyan. 
-      Content: Aesthetic mountains, floating clouds, and rhythmic ink splashes. High quality, artistic.`;
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const prompt = `A beautiful, cute, and minimalist traditional Chinese ink painting background for a music game. 
+    Theme: "${fileName.replace(/\.[^/.]+$/, "")}". 
+    Style: "Cute Diffuse" with soft gradients. Colors: Zhu Red, Stone Cyan, Ink. 
+    High quality, artistic composition.`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
-        contents: [{ parts: [{ text: prompt }] }],
-      });
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash-image',
+          contents: [{ parts: [{ text: prompt }] }],
+        });
 
-      for (const part of response.candidates?.[0]?.content?.parts || []) {
-        if (part.inlineData) {
-          const imageUrl = `data:image/png;base64,${part.inlineData.data}`;
-          setBackgroundUrl(imageUrl);
-          break;
+        for (const part of response.candidates?.[0]?.content?.parts || []) {
+          if (part.inlineData) {
+            const imageUrl = `data:image/png;base64,${part.inlineData.data}`;
+            setBackgroundUrl(imageUrl);
+            setIsGeneratingBg(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn(`Attempt ${i + 1} failed for AI Background:`, error);
+        if (i === retries) {
+           console.error("Max retries reached for background generation.");
+        } else {
+           await new Promise(r => setTimeout(r, 1000 * (i + 1))); // Exponential delay
         }
       }
-    } catch (error) {
-      console.error("AI Background generation failed:", error);
-    } finally {
-      setIsGeneratingBg(false);
     }
+    setIsGeneratingBg(false);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +73,7 @@ const App: React.FC = () => {
       const url = URL.createObjectURL(file);
       setAudioUrl(url);
       audioRef.current.src = url;
-      generateAIBackground(file.name);
+      generateAIBackgroundWithRetry(file.name);
     }
   };
 
@@ -202,32 +208,45 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Initial Landing Screen - Scaled down for embedding */}
-      {gameStatus === GameStatus.IDLE && (
+      {/* Initial Landing Screen */}
+      {(gameStatus === GameStatus.IDLE || gameStatus === GameStatus.LOADING) && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#f4f1e8]/98 z-20">
           <div className="bg-white p-8 md:p-10 border-4 border-[#1a1a1a] text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] max-w-lg w-full rounded-[2.5rem] transform scale-[0.85] transition-transform flex flex-col items-center">
             <h1 className="text-[6rem] leading-none ink-text mb-4 text-[#1a1a1a]">京韵<span className="text-[#c02c38]">鼓神</span></h1>
             
-            <div className="w-full mb-6 p-6 border-4 border-dashed border-[#2e5e6e]/20 rounded-[1.5rem] bg-[#2e5e6e]/5 flex flex-col items-center">
-              <label className="flex flex-col items-center cursor-pointer group">
-                {isGeneratingBg ? (
-                   <Sparkles className="mb-3 text-[#c02c38] animate-spin" size={48} />
-                ) : (
-                   <Music className="mb-3 text-[#2e5e6e] group-hover:scale-110 transition-transform duration-300" size={48} />
-                )}
-                <span className="ink-text text-xl mb-3 font-bold text-[#1a1a1a]">
-                  {isGeneratingBg ? "AI 画师正在作画..." : audioUrl ? "曲谱与景致已备齐" : "请上传背景音律"}
-                </span>
-                <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
-                <div className="bg-[#1a1a1a] text-[#f4f1e8] px-6 py-2 rounded-full ink-text text-lg hover:bg-[#333] transition-colors shadow-lg">选择曲目 (MP3)</div>
-              </label>
-            </div>
+            {mpError ? (
+               <div className="p-4 bg-red-50 text-red-600 border border-red-200 rounded-xl mb-6">
+                  <p className="font-bold">加载失败：</p>
+                  <p className="text-sm">{mpError}</p>
+                  <button onClick={() => window.location.reload()} className="mt-2 text-xs underline">点此重试刷新</button>
+               </div>
+            ) : gameStatus === GameStatus.LOADING ? (
+               <div className="flex flex-col items-center mb-6">
+                  <RefreshCw className="w-12 h-12 text-[#2e5e6e] animate-spin mb-4" />
+                  <p className="ink-text text-lg">梨园班子正在入场...</p>
+               </div>
+            ) : (
+              <div className="w-full mb-6 p-6 border-4 border-dashed border-[#2e5e6e]/20 rounded-[1.5rem] bg-[#2e5e6e]/5 flex flex-col items-center">
+                <label className="flex flex-col items-center cursor-pointer group">
+                  {isGeneratingBg ? (
+                     <Sparkles className="mb-3 text-[#c02c38] animate-spin" size={48} />
+                  ) : (
+                     <Music className="mb-3 text-[#2e5e6e] group-hover:scale-110 transition-transform duration-300" size={48} />
+                  )}
+                  <span className="ink-text text-xl mb-3 font-bold text-[#1a1a1a]">
+                    {isGeneratingBg ? "AI 画师正在作画..." : audioUrl ? "曲谱与景致已备齐" : "请上传背景音律"}
+                  </span>
+                  <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
+                  <div className="bg-[#1a1a1a] text-[#f4f1e8] px-6 py-2 rounded-full ink-text text-lg hover:bg-[#333] transition-colors shadow-lg">选择曲目 (MP3)</div>
+                </label>
+              </div>
+            )}
 
             <button 
-              disabled={!audioUrl || isGeneratingBg}
+              disabled={!audioUrl || isGeneratingBg || !isCameraReady}
               onClick={startGame}
               className={`w-full py-4 text-3xl font-bold border-4 border-[#1a1a1a] transition-all ink-text flex items-center justify-center gap-4 rounded-[1.2rem]
-                ${(!audioUrl || isGeneratingBg) ? 'bg-gray-200 text-gray-400 cursor-not-allowed border-gray-300' : 'bg-[#c02c38] text-white hover:shadow-[0_10px_30px_rgba(192,44,56,0.3)] active:scale-95'}`}
+                ${(!audioUrl || isGeneratingBg || !isCameraReady) ? 'bg-gray-200 text-gray-400 cursor-not-allowed border-gray-300' : 'bg-[#c02c38] text-white hover:shadow-[0_10px_30px_rgba(192,44,56,0.3)] active:scale-95'}`}
             >
               <Play fill="white" size={32} /> 开 场
             </button>
