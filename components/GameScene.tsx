@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React, { useRef, useState, useMemo, useEffect } from 'react';
+import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -67,6 +67,7 @@ const HexagonalTrack = () => {
 };
 
 const TextureMesh: React.FC<{ url: string }> = ({ url }) => {
+    // 异步加载纹理，受内部 Suspense 保护
     const texture = useTexture(url);
     return (
         <mesh position={[0, 10, -50]}>
@@ -76,19 +77,21 @@ const TextureMesh: React.FC<{ url: string }> = ({ url }) => {
     );
 };
 
-const BackgroundLayer: React.FC<{ url: string | null }> = ({ url }) => {
-    if (url) {
-        return <TextureMesh url={url} />;
-    }
+const DefaultBackground = () => (
+    <group position={[0, 0, -45]}>
+        <DiffuseBlob position={[-30, 10, -5]} scale={15} color="#ffcfd2" />
+        <DiffuseBlob position={[25, 15, -10]} scale={20} color="#cfdcff" />
+        <DiffuseBlob position={[-15, -10, 5]} scale={25} color="#e2ffcf" />
+        <DiffuseBlob position={[10, -5, 0]} scale={12} color="#fff4cf" />
+        <DiffuseBlob position={[0, 25, -20]} scale={30} color="#f4cfff" />
+    </group>
+);
 
+const BackgroundLayer: React.FC<{ url: string | null }> = ({ url }) => {
     return (
-        <group position={[0, 0, -45]}>
-            <DiffuseBlob position={[-30, 10, -5]} scale={15} color="#ffcfd2" />
-            <DiffuseBlob position={[25, 15, -10]} scale={20} color="#cfdcff" />
-            <DiffuseBlob position={[-15, -10, 5]} scale={25} color="#e2ffcf" />
-            <DiffuseBlob position={[10, -5, 0]} scale={12} color="#fff4cf" />
-            <DiffuseBlob position={[0, 25, -20]} scale={30} color="#f4cfff" />
-        </group>
+        <Suspense fallback={<DefaultBackground />}>
+            {url ? <TextureMesh url={url} /> : <DefaultBackground />}
+        </Suspense>
     );
 };
 

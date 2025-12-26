@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React, { useRef, useState, useEffect, useCallback, Suspense } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { GameStatus, NoteData } from './types';
 import { useMediaPipe } from './hooks/useMediaPipe';
@@ -150,8 +150,13 @@ const App: React.FC = () => {
     <div className="relative w-full h-full bg-[#f4f1e8] overflow-hidden font-serif">
       <video ref={videoRef} className="absolute opacity-0 pointer-events-none" playsInline muted autoPlay />
       
-      <Canvas shadows dpr={[1, 2]}>
-          <Suspense fallback={null}>
+      <div className="absolute inset-0 z-0">
+          <Canvas 
+            shadows 
+            dpr={[1, 2]}
+            style={{ width: '100%', height: '100%' }}
+            gl={{ alpha: false, antialias: true }}
+          >
               <GameScene 
                 gameStatus={gameStatus} 
                 audioRef={audioRef} 
@@ -162,8 +167,8 @@ const App: React.FC = () => {
                 onNoteMiss={handleNoteMiss}
                 onSongEnd={() => setGameStatus(GameStatus.VICTORY)}
               />
-          </Suspense>
-      </Canvas>
+          </Canvas>
+      </div>
 
       <WebcamPreview videoRef={videoRef} resultsRef={lastResultsRef} isCameraReady={isCameraReady} />
 
