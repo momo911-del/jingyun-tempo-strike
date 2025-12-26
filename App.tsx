@@ -1,10 +1,9 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { GameStatus, NoteData } from './types';
 import { useMediaPipe } from './hooks/useMediaPipe';
@@ -35,7 +34,6 @@ const App: React.FC = () => {
 
   const generateAIBackgroundWithRetry = async (fileName: string, retries = 2) => {
     setIsGeneratingBg(true);
-    // Initialize GoogleGenAI right before making the API call as per guidelines.
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `A beautiful, cute, and minimalist traditional Chinese ink painting background for a music game. 
     Theme: "${fileName.replace(/\.[^/.]+$/, "")}". 
@@ -44,13 +42,11 @@ const App: React.FC = () => {
 
     for (let i = 0; i <= retries; i++) {
       try {
-        // Call generateContent for text-to-image with gemini-2.5-flash-image.
         const response = await ai.models.generateContent({
           model: 'gemini-2.5-flash-image',
           contents: { parts: [{ text: prompt }] },
         });
 
-        // Iterate through all parts to extract the generated image.
         for (const part of response.candidates?.[0]?.content?.parts || []) {
           if (part.inlineData) {
             const imageUrl = `data:image/png;base64,${part.inlineData.data}`;
@@ -64,7 +60,7 @@ const App: React.FC = () => {
         if (i === retries) {
            console.error("Max retries reached for background generation.");
         } else {
-           await new Promise(r => setTimeout(r, 1000 * (i + 1))); // Exponential delay
+           await new Promise(r => setTimeout(r, 1000 * (i + 1))); 
         }
       }
     }
@@ -161,16 +157,18 @@ const App: React.FC = () => {
             style={{ width: '100%', height: '100%' }}
             gl={{ alpha: false, antialias: true }}
           >
-              <GameScene 
-                gameStatus={gameStatus} 
-                audioRef={audioRef} 
-                handPositionsRef={handPositionsRef}
-                chart={chart}
-                backgroundUrl={backgroundUrl}
-                onNoteHit={handleNoteHit}
-                onNoteMiss={handleNoteMiss}
-                onSongEnd={() => setGameStatus(GameStatus.VICTORY)}
-              />
+              <Suspense fallback={null}>
+                  <GameScene 
+                    gameStatus={gameStatus} 
+                    audioRef={audioRef} 
+                    handPositionsRef={handPositionsRef}
+                    chart={chart}
+                    backgroundUrl={backgroundUrl}
+                    onNoteHit={handleNoteHit}
+                    onNoteMiss={handleNoteMiss}
+                    onSongEnd={() => setGameStatus(GameStatus.VICTORY)}
+                  />
+              </Suspense>
           </Canvas>
       </div>
 
@@ -219,17 +217,16 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Initial Landing Screen */}
       {(gameStatus === GameStatus.IDLE || gameStatus === GameStatus.LOADING) && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#f4f1e8]/98 z-20">
-          <div className="bg-white p-8 md:p-10 border-4 border-[#1a1a1a] text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] max-w-lg w-full rounded-[2.5rem] transform scale-[0.85] transition-transform flex flex-col items-center">
+          <div className="bg-white p-8 md:p-10 border-4 border-[#1a1a1a] text-center shadow-2xl max-w-lg w-full rounded-[2.5rem] transform scale-[0.85] flex flex-col items-center">
             <h1 className="text-[6rem] leading-none ink-text mb-4 text-[#1a1a1a]">京韵<span className="text-[#c02c38]">鼓神</span></h1>
             
             {mpError ? (
                <div className="p-4 bg-red-50 text-red-600 border border-red-200 rounded-xl mb-6">
                   <p className="font-bold">加载失败：</p>
                   <p className="text-sm">{mpError}</p>
-                  <button onClick={() => window.location.reload()} className="mt-2 text-xs underline">点此重试刷新</button>
+                  <button onClick={() => window.location.reload()} className="mt-2 text-xs underline">重试刷新</button>
                </div>
             ) : gameStatus === GameStatus.LOADING ? (
                <div className="flex flex-col items-center mb-6">
@@ -245,10 +242,10 @@ const App: React.FC = () => {
                      <Music className="mb-3 text-[#2e5e6e] group-hover:scale-110 transition-transform duration-300" size={48} />
                   )}
                   <span className="ink-text text-xl mb-3 font-bold text-[#1a1a1a]">
-                    {isGeneratingBg ? "AI 画师正在作画..." : audioUrl ? "曲谱与景致已备齐" : "请上传背景音律"}
+                    {isGeneratingBg ? "AI 画师正在作画..." : audioUrl ? "曲谱已备齐" : "请上传背景音律"}
                   </span>
                   <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
-                  <div className="bg-[#1a1a1a] text-[#f4f1e8] px-6 py-2 rounded-full ink-text text-lg hover:bg-[#333] transition-colors shadow-lg">选择曲目 (MP3)</div>
+                  <div className="bg-[#1a1a1a] text-[#f4f1e8] px-6 py-2 rounded-full ink-text text-lg hover:bg-[#333] shadow-lg">选择曲目 (MP3)</div>
                 </label>
               </div>
             )}
@@ -257,7 +254,7 @@ const App: React.FC = () => {
               disabled={!audioUrl || isGeneratingBg || !isCameraReady}
               onClick={startGame}
               className={`w-full py-4 text-3xl font-bold border-4 border-[#1a1a1a] transition-all ink-text flex items-center justify-center gap-4 rounded-[1.2rem]
-                ${(!audioUrl || isGeneratingBg || !isCameraReady) ? 'bg-gray-200 text-gray-400 cursor-not-allowed border-gray-300' : 'bg-[#c02c38] text-white hover:shadow-[0_10px_30px_rgba(192,44,56,0.3)] active:scale-95'}`}
+                ${(!audioUrl || isGeneratingBg || !isCameraReady) ? 'bg-gray-200 text-gray-400 cursor-not-allowed border-gray-300' : 'bg-[#c02c38] text-white hover:brightness-110 active:scale-95'}`}
             >
               <Play fill="white" size={32} /> 开 场
             </button>
@@ -265,15 +262,14 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Result Screens */}
       {(gameStatus === GameStatus.GAME_OVER || gameStatus === GameStatus.VICTORY) && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]/60 backdrop-blur-md z-30 p-4">
-          <div className="bg-[#f4f1e8] p-10 border-4 border-[#1a1a1a] text-center shadow-2xl max-w-sm rounded-[2rem] transform scale-[0.9]">
+          <div className="bg-[#f4f1e8] p-10 border-4 border-[#1a1a1a] text-center shadow-2xl max-w-sm rounded-[2rem]">
             <h2 className={`text-[5rem] leading-none ink-text mb-6 ${gameStatus === GameStatus.VICTORY ? 'text-[#2e5e6e]' : 'text-[#c02c38]'}`}>
               {gameStatus === GameStatus.VICTORY ? "曲终奏雅" : "气数已尽"}
             </h2>
             <div className="space-y-2 mb-8">
-                <p className="text-xl font-serif font-black text-[#1a1a1a] opacity-60">得分</p>
+                <p className="text-xl font-serif font-black text-[#1a1a1a] opacity-60">最终得分</p>
                 <p className="text-6xl font-black ink-text text-[#1a1a1a]">{score.toLocaleString()}</p>
             </div>
             <button onClick={resetGame} className="bg-[#1a1a1a] text-[#f4f1e8] px-8 py-3 text-2xl ink-text flex items-center gap-3 mx-auto rounded-full hover:brightness-125 transition-all shadow-xl active:scale-95">

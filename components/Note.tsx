@@ -4,12 +4,21 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-/// <reference types="@react-three/fiber" />
 import React, { useMemo, useRef } from 'react';
 import { useFrame, ThreeElements } from '@react-three/fiber';
 import * as THREE from 'three';
 import { NoteData, COLORS } from '../types';
 import { getLanePosition, NOTE_SIZE } from '../constants';
+
+// Define intrinsic elements to satisfy TypeScript when @react-three/fiber types are not globally recognized.
+const mesh = 'mesh' as any;
+const group = 'group' as any;
+const sphereGeometry = 'sphereGeometry' as any;
+const meshBasicMaterial = 'meshBasicMaterial' as any;
+const cylinderGeometry = 'cylinderGeometry' as any;
+const meshStandardMaterial = 'meshStandardMaterial' as any;
+const ringGeometry = 'ringGeometry' as any;
+const circleGeometry = 'circleGeometry' as any;
 
 interface NoteProps {
   data: NoteData;
@@ -36,7 +45,6 @@ const Debris: React.FC<{ data: NoteData, timeSinceHit: number, color: string }> 
     });
 
     return (
-        // Added group, mesh, ringGeometry, sphereGeometry intrinsic elements
         <group ref={groupRef}>
              <mesh rotation={[Math.PI/2, 0, 0]}>
                  <ringGeometry args={[0.3, 1.5 + timeSinceHit * 5, 32]} />
@@ -82,7 +90,6 @@ const Note: React.FC<NoteProps> = ({ data, zPos, currentTime }) => {
   }
 
   return (
-    // Added cylinderGeometry, meshStandardMaterial, ringGeometry, circleGeometry intrinsic elements
     <group position={position} rotation={[Math.PI / 2, 0, rotationZ]}>
       {/* Glow Aura */}
       <mesh scale={[1.3, 1, 1.3]}>

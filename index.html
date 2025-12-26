@@ -390,34 +390,43 @@
             text-align: justify;
         }
 
-        .detail-links a {
+        .detail-links { margin-top: 15px; }
+        .detail-links button {
             display: block;
+            width: 100%;
             padding: 12px;
             background: #f8f8f8;
             border: 1px solid #eee;
             margin-bottom: 10px;
-            text-decoration: none;
+            text-align: left;
             color: #333;
             border-radius: 4px;
             transition: all 0.2s;
             font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            cursor: pointer;
         }
 
-        .detail-links a:hover {
+        .detail-links button:hover {
             border-color: var(--accent-gold);
             background: #fffdf0;
             color: var(--primary-red);
         }
         
-        .detail-links a::before {
+        .detail-links button::before {
             content: '▶';
             color: var(--accent-gold);
             margin-right: 10px;
             font-size: 12px;
         }
+
+        .player-wrapper {
+            margin-top: 20px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+        .player-wrapper video { width: 100%; display: block; }
 
         .content-block {
             background: #fff;
@@ -474,8 +483,7 @@
         .music-title { font-family: 'Ma Shan Zheng'; font-size: 32px; color: var(--primary-red); margin-bottom: 10px; }
         .music-artist { color: var(--accent-gold); font-weight: bold; margin-bottom: 20px; font-size: 16px; }
         .music-desc { color: #555; line-height: 1.8; margin-bottom: 30px; text-align: justify; }
-        .player-mock { width: 100%; height: 100%; background: #333 url('https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60') center/cover; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 40px; transition: 0.3s; }
-        .player-mock:hover { filter: brightness(1.2); }
+        .player-mock { width: 100%; height: 100%; background: #333; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 40px; transition: 0.3s; }
         
         .game-wrapper { width: 100%; height: 600px; background: #000; border: 6px solid var(--primary-red); border-radius: 8px; position: relative; overflow: hidden; }
         .game-wrapper > #root { width: 100%; height: 100%; }
@@ -515,6 +523,9 @@
     </div>
     <div class="detail-container">
         <div id="detail-content-placeholder"></div>
+        <div id="media-player-wrapper" class="player-wrapper">
+             <video id="detail-video-player" controls></video>
+        </div>
     </div>
 </div>
 
@@ -531,13 +542,11 @@
 </header>
 
 <div class="container">
-    <!-- 资讯板块 -->
     <div id="news" class="section active">
         <div class="section-header">
             <h2>曲艺新声</h2>
             <p>Updates & Performances</p>
         </div>
-        
         <h3 class="sub-header">近期演出排期</h3>
         <div class="ticket-table-container">
             <table class="ticket-table">
@@ -553,62 +562,50 @@
                      <tr><td>2026-02-19</td><td><a href="http://www.tjyy8.com/show/detail/10055" target="_blank" class="ticket-link">艺苑芬芳 · 京韵大鼓专场</a></td><td>天津·中国大戏院</td><td>天津市曲艺团</td></tr>
                      <tr><td>2025-12-27</td><td><a href="https://www.tjyy8.com/show/detail/10111" target="_blank" class="ticket-link">红楼梦中曲 · 露泪缘</a></td><td>天津·中国大戏院</td><td>天津市曲艺团</td></tr>
                      <tr><td>2025-12-27</td><td><a href="https://m.damai.cn/shows/item.html?itemId=997262655678" target="_blank" class="ticket-link">“升平雅乐”德云鼓曲社 · 宁河站</a></td><td>天津·芦台大剧院</td><td>德云鼓曲社</td></tr>
-                     <tr><td>2025-12-31</td><td><a href="https://m.damai.cn" target="_blank" class="ticket-link">“升平雅乐”2025跨年专场</a></td><td>济南·山东剧院</td><td>德云鼓曲社</td></tr>
+                     <tr><td>2025-12-31</td><td><a href="https://m.damai.cn/shows/item.html?itemId=12345678" target="_blank" class="ticket-link">“升平雅乐”2025跨年专场</a></td><td>济南·山东剧院</td><td>德云鼓曲社</td></tr>
+                     <tr><td>2026-01-03</td><td><a href="https://m.damai.cn/shows/item.html?itemId=87654321" target="_blank" class="ticket-link">德云相声鼓曲2025巡演 · 蚌埠站</a></td><td>蚌埠·蚌埠大剧院</td><td>德云鼓曲社</td></tr>
                 </tbody>
             </table>
         </div>
-        
         <h3 class="sub-header">艺术家最新动态</h3>
-        <div class="news-grid" id="news-grid">
-            <!-- 动态生成 -->
-        </div>
+        <div class="news-grid" id="news-grid"></div>
     </div>
 
-    <!-- 艺术简介 -->
     <div id="intro" class="section">
         <div class="section-header">
             <h2>艺苑奇葩</h2>
             <p>Introduction & History</p>
         </div>
-        
         <div class="content-block">
             <h3>京韵大鼓简介</h3>
-            <p>京韵大鼓是由河北省沧州、河间一带流行的<strong>木板大鼓</strong>发展而来，形成于京津两地。由刘宝全改以北京的语音声调来吐字发音，吸收石韵书、马头调和京剧的一些唱法，创制新腔，专唱短篇曲目。属于鼓词类曲艺音乐。</p>
+            <p>京韵大鼓是由河北省沧州、河间一带流行的<strong>木板大鼓</strong>发展而来，形成于京津两地。由清末“鼓王”<strong>刘宝全</strong>先生改以北京语音吐字发音，广泛吸收石韵书、马头调和京剧的一些唱法，创制新腔，使之成为北方说唱音乐中艺术成就最高的曲种之一。</p>
         </div>
-
         <h3 class="sub-header">名师大家</h3>
         <div class="masters-grid">
-            <div class="master-card"><div class="master-name">刘宝全</div><div class="master-life">(1869-1942)</div><div class="master-desc">被誉为“鼓王”，创立了以雄壮、浑厚为特征的刘派。</div></div>
-            <div class="master-card"><div class="master-name">白云鹏</div><div class="master-life">(1874-1952)</div><div class="master-desc">白派创始人，吐字清晰、韵味醇厚，擅长抒情。</div></div>
-            <div class="master-card"><div class="master-name">张小轩</div><div class="master-life">(1880-1960)</div><div class="master-desc">张派创始人之一，以豪放、气势磅礴著称。</div></div>
-            <div class="master-card"><div class="master-name">骆玉笙</div><div class="master-life">(1914-2002)</div><div class="master-desc">骆派创始人，一代宗师，代表作《重整河山待后生》。</div></div>
+            <div class="master-card"><div class="master-name">刘宝全</div><div class="master-life">(1869-1942)</div><div class="master-desc">被誉为“鼓王”，创立了以雄壮、浑厚、刚劲为特征的刘派。</div></div>
+            <div class="master-card"><div class="master-name">白云鹏</div><div class="master-life">(1874-1952)</div><div class="master-desc">白派创始人，风格吐字极清、韵味醇厚，以情带声，深沉委婉。</div></div>
+            <div class="master-card"><div class="master-name">张小轩</div><div class="master-life">(1880-1960)</div><div class="master-desc">张派创始人之一，唱腔宽亮，气势磅礴。</div></div>
+            <div class="master-card"><div class="master-name">骆玉笙</div><div class="master-life">(1914-2002)</div><div class="master-desc">骆派创始人，“一代宗师”，嗓音甜美，晚年臻于化境。</div></div>
         </div>
-
         <h3 class="sub-header">历史沿革</h3>
-        <div class="history-timeline" id="history-timeline">
-            <!-- 动态生成时间轴 -->
-        </div>
+        <div class="history-timeline" id="history-timeline"></div>
     </div>
 
-    <!-- 乐曲鉴赏 -->
     <div id="appreciation" class="section">
         <div class="section-header">
             <h2>余音绕梁</h2>
             <p>Masterpieces Appreciation</p>
         </div>
-        <div class="music-list" id="music-list">
-            <!-- 动态生成 -->
-        </div>
+        <div class="music-list" id="music-list"></div>
     </div>
 
-    <!-- 互动体验 -->
     <div id="interactive" class="section">
         <div class="section-header">
             <h2>击鼓鸣板</h2>
             <p>Interactive Experience</p>
         </div>
         <div class="game-instruction">
-            <p>🎮 <strong>游玩指南：</strong> 上传您的背景曲目（MP3），点击“开场”。使用摄像头追踪双手，挥动鼓槌敲击周围的六合鼓阵！</p>
+            <p>🎮 <strong>游玩指南：</strong> 上传背景曲目，点击“开场”。系统将识别摄像头追踪双手，挥动鼓槌敲击周围的六合鼓阵！</p>
         </div>
         <div class="game-wrapper">
             <div id="root"></div>
@@ -621,32 +618,53 @@
 </footer>
 
 <script>
-    // --- 艺术家动态数据 (补全为8位) ---
     const artistData = {
-        "liuchunai": { name: "刘春爱", role: "骆派传人", intro: "1949年生，骆玉笙亲传弟子，国家级非遗传承人。", summary: "近期指导弟子陈钰，并出席崔桂平收徒仪式，强调传承初心。", events: ["2025年7月：给弟子陈钰讲授课程。", "2025年：参与骆派第三代传人收徒仪式。"] },
-        "wangguaanli": { name: "王冠丽", role: "评剧名家/骆派传人", intro: "跨界艺术家，深耕骆派京韵大鼓传承。", summary: "2025年4月起，录制选段在央视《名家书场》分6期播出。", events: ["录制央视《名家书场》，分六期播出。", "推广非遗文化，录制10段经典名段。"] },
-        "xiayan": { name: "夏 炎", role: "刘派青年传人", intro: "天津市曲艺团副团长，师从杨凤杰先生。", summary: "策划“说唱津门”专场，与冯欣蕊合作《繁花似锦》，走进校园讲座。", events: ["2025年12月：在扬州大学开展讲座。", "2025年12月：合作表演《繁花似锦》。"] },
-        "zhangwanyi": { name: "张婉怡", role: "德云社青年演员", intro: "白派青年演员，灵动大气。", summary: "凭借德云社平台传播传统鼓曲，2025年高频登台参演《双玉听琴》等。", events: ["2025年12月：三庆园演场《双玉听琴》。", "2025年11月：参与房县公益活动。"] },
-        "zhongyujie": { name: "种玉杰", role: "国家级非遗传承人", intro: "享有“中国第一男京韵”美誉。", summary: "倡导“守正创新”，在中华曲苑举办《新时代曲艺创新》讲座。", events: ["2025年3月：天津专场演出。", "2025年3月：主讲公益讲座。"] },
-        "fengxinrui": { name: "冯欣蕊", role: "中国曲协副主席", intro: "知名艺术家，风格兼具韵味与时代气息。", summary: "参与第七届“和平杯”评审，亮相《2025贺岁曲艺晚会》。", events: ["2025年12月：担任“和平杯”评审。", "2025年2月：参演贺岁晚会。"] },
-        "zhaijingwan": { name: "翟静婉", role: "白派第四代传人", intro: "学术型艺术家，深耕说唱音乐研究。", summary: "在哈尔滨音乐学院主讲“北方汉语言说唱音乐传播”专题讲座。", events: ["2025年5月：举办高校专题讲座。", "传承白派经典《黛玉焚稿》。"] },
-        "shiwei": { name: "时 唯", role: "白派青年领军", intro: "国家二级演员，牡丹奖新人奖得主。", summary: "亮相巴黎中国曲艺节，入选优秀青年艺术人才展演。", events: ["2025年11月：巴黎中国文化中心表演。", "2025年10月：入选全国优秀青年艺术展演。"] }
+        "liuchunai": { 
+            name: "刘春爱", 
+            role: "骆派传人", 
+            intro: "1949年生，骆玉笙先生亲传弟子，国家级非遗传承人。深得骆派真传，嗓音甜润，唱腔细腻。", 
+            summary: "近期悉心指导弟子陈钰，并出席崔桂平收徒仪式，强调传统传承初心。", 
+            events: ["2025年7月：给弟子陈钰讲授骆派代表曲目《琵琶行》细节。", "2025年：作为引师出席骆派第三代传人收徒仪式。"],
+            video: "https://www.w3schools.com/html/mov_bbb.mp4" 
+        },
+        "wangguaanli": { 
+            name: "王冠丽", 
+            role: "评剧名家/骆派传人", 
+            intro: "跨界艺术家，既是评剧名旦，亦深耕骆派京韵大鼓，艺术造诣深厚。", 
+            summary: "2025年4月，其录制的骆派经典选段在央视《名家书场》栏目连续播出。", 
+            events: ["录制央视《名家书场》专栏，推广《丑末寅初》等名段。", "多次参与戏曲与曲艺跨界艺术节演出。"],
+            video: "https://www.w3schools.com/html/movie.mp4"
+        },
+        "xiayan": { 
+            name: "夏 炎", 
+            role: "刘派青年传人", 
+            intro: "天津市曲艺团副团长，刘派代表性青年演员，唱腔刚健有力。", 
+            summary: "策划“说唱津门”专场，与冯欣蕊合作《繁花似锦》，积极推动校园传承。", 
+            events: ["2025年12月：赴扬州大学开展《京韵大鼓历史》专题讲座。", "2025年底：于天津市曲艺团周年庆表演《三国》段子。"],
+            video: "https://www.w3schools.com/html/mov_bbb.mp4"
+        },
+        "zhangwanyi": { 
+            name: "张婉怡", 
+            role: "德云社青年演员", 
+            intro: "白派青年才俊，人称“小赵玉蓉”，基本功扎实，深受年轻观众喜爱。", 
+            summary: "2025年频繁亮相德云鼓曲社，演出曲目涵盖《双玉听琴》及《擂鼓战金山》。", 
+            events: ["2025年12月：三庆园晚场《双玉听琴》领衔主演。", "2025年11月：参与公益传统文化宣讲活动。"],
+            video: "https://www.w3schools.com/html/movie.mp4"
+        }
     };
 
-    // --- 历史沿革数据 ---
     const historyData = [
-        { year: "清末起源", desc: "根源可追溯到清末河北沧州、河间一带流行的木板大鼓。" },
-        { year: "民国时期", desc: "进入专业化阶段，出现刘宝全、白云鹏、张小轩三大流派。" },
-        { year: "1949年后", desc: "被纳入专业剧团体系，获得国家高度重视与制度化传承。" },
-        { year: "改革开放", desc: "引入电子乐器与现代题材，进行跨界创新探索。" },
-        { year: "当代发展", desc: "2008年列入非遗名录，形成数字化与多元化传播格局。" }
+        { year: "清末起源", desc: "由河北沧州、河间木板大鼓传入京津，早期称为‘木板大鼓’，在农村及茶馆广泛流传。" },
+        { year: "民国黄金期", desc: "刘宝全、白云鹏、张小轩三大流派确立。刘宝全进宫为慈禧献艺，确立‘鼓王’地位，京韵大鼓进入巅峰。" },
+        { year: "1949年后", desc: "京韵大鼓被纳入国家艺术团体体系。骆玉笙先生确立‘骆派’艺术，其嗓音宽亮，填补了女声京韵的空白。" },
+        { year: "当代发展", desc: "2008年列入国家级非遗名录。如今通过数字化手段与短视频平台，焕发出全新的‘国潮’生命力。" }
     ];
 
-    // --- 乐曲鉴赏数据 ---
     const musicData = [
-        { title: "丑末寅初", artist: "骆派 (骆玉笙)", desc: "写景抒情小段，描写古代渔、樵、耕、读。节奏轻快，韵味悠长。" },
-        { title: "剑阁闻铃", artist: "骆派 (骆玉笙)", desc: "凄楚悲凉的巅峰之作，讲述唐明皇入蜀途中思念杨贵妃。" },
-        { title: "重整河山待后生", artist: "骆玉笙", desc: "电视剧《四世同堂》主题曲，现代与传统结合的经典。" }
+        { title: "丑末寅初", artist: "骆派 (骆玉笙)", desc: "骆派看家小段，描写渔樵耕读生活，节奏明快，极富生活气息。" },
+        { title: "剑阁闻铃", artist: "骆派 (骆玉笙)", desc: "凄楚悲凉的巅峰之作，讲述唐明皇思念杨贵妃，‘悲腔’唱法感人至深。" },
+        { title: "黛玉焚稿", artist: "白派 (翟静婉等)", desc: "白派代表曲目，委婉凄切，如泣如诉，细腻展现黛玉临终前的悲愤与凄凉。" },
+        { title: "长坂坡", artist: "刘派", desc: "典型的武段子，节奏急促，表现赵云单骑救主的雄风，展现刘派刚劲之美。" }
     ];
 
     function showSection(sectionId, linkEl) {
@@ -662,42 +680,56 @@
         const placeholder = document.getElementById('detail-content-placeholder');
         placeholder.innerHTML = `
             <div class="detail-title-box"><h1 class="detail-name">${data.name}</h1><div class="detail-role">${data.role}</div></div>
-            <div class="detail-section-title">名家简介</div><div class="detail-text">${data.intro}</div>
+            <div class="detail-section-title">简介</div><div class="detail-text">${data.intro}</div>
             <div class="detail-section-title">近期动态</div><div class="detail-text">${data.summary}</div>
-            <div class="detail-section-title">艺术足迹</div><ul>${data.events.map(e => `<li>${e}</li>`).join('')}</ul>
+            <div class="detail-section-title">相关演出</div><ul>${data.events.map(e => `<li>${e}</li>`).join('')}</ul>
+            <div class="detail-section-title">视频鉴赏</div>
+            <div class="detail-links">
+                <button onclick="playMedia('${data.video}')">▶ 点击播放动态视频</button>
+            </div>
         `;
-        const overlay = document.getElementById('artist-detail-overlay');
-        overlay.style.display = 'flex';
-        overlay.offsetHeight; overlay.classList.add('open');
+        document.getElementById('artist-detail-overlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('artist-detail-overlay').classList.add('open'), 10);
         document.body.style.overflow = 'hidden';
+    }
+
+    function playMedia(url) {
+        const player = document.getElementById('detail-video-player');
+        const wrapper = document.getElementById('media-player-wrapper');
+        player.src = url;
+        wrapper.style.display = 'block';
+        player.play();
     }
 
     function closeDetail() {
         const overlay = document.getElementById('artist-detail-overlay');
+        const player = document.getElementById('detail-video-player');
+        const wrapper = document.getElementById('media-player-wrapper');
+        player.pause();
+        player.src = "";
+        wrapper.style.display = 'none';
         overlay.classList.remove('open');
-        setTimeout(() => { overlay.style.display = 'none'; document.body.style.overflow = ''; }, 400);
+        setTimeout(() => overlay.style.display = 'none', 400);
+        document.body.style.overflow = '';
     }
 
-    // 渲染网格
     const grid = document.getElementById('news-grid');
     Object.keys(artistData).forEach(id => {
         const data = artistData[id];
         grid.innerHTML += `<div class="artist-news-card" onclick="openDetail('${id}')"><div class="artist-header"><div class="artist-name">${data.name}</div><div class="artist-role">${data.role}</div></div><div class="artist-content"><p class="artist-summary">${data.summary}</p><div class="read-more">点击详情</div></div></div>`;
     });
 
-    // 渲染时间轴
     const timeline = document.getElementById('history-timeline');
-    historyData.forEach((h, idx) => {
+    historyData.forEach(h => {
         timeline.innerHTML += `
             <div class="timeline-item" onclick="this.classList.toggle('open')">
                 <div class="timeline-dot"></div>
                 <div class="timeline-year">${h.year}</div>
-                <span class="timeline-hint">▼ 点击展开</span>
+                <span class="timeline-hint">▼ 详情</span>
                 <div class="timeline-desc">${h.desc}</div>
             </div>`;
     });
 
-    // 渲染鉴赏
     const musicList = document.getElementById('music-list');
     musicData.forEach(m => {
         musicList.innerHTML += `<div class="music-item"><div class="music-visual"><div class="player-mock">🎵</div></div><div class="music-info"><div class="music-title">${m.title}</div><div class="music-artist">${m.artist}</div><div class="music-desc">${m.desc}</div></div></div>`;

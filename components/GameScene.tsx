@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-/// <reference types="@react-three/fiber" />
 import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
 import { useFrame, ThreeElements } from '@react-three/fiber';
 import { PerspectiveCamera, useTexture } from '@react-three/drei';
@@ -13,6 +12,18 @@ import { GameStatus, NoteData, HandPositions, COLORS } from '../types';
 import { PLAYER_Z, SPAWN_Z, MISS_Z, NOTE_SPEED, HEX_RADIUS, HEX_CENTER_Y, getLanePosition } from '../constants';
 import Note from './Note';
 import Saber from './Saber';
+
+// Define intrinsic elements to satisfy TypeScript when @react-three/fiber types are not globally recognized.
+const mesh = 'mesh' as any;
+const group = 'group' as any;
+const sphereGeometry = 'sphereGeometry' as any;
+const meshBasicMaterial = 'meshBasicMaterial' as any;
+const planeGeometry = 'planeGeometry' as any;
+const ringGeometry = 'ringGeometry' as any;
+const ambientLight = 'ambientLight' as any;
+const directionalLight = 'directionalLight' as any;
+const fog = 'fog' as any;
+const color = 'color' as any;
 
 interface GameSceneProps {
   gameStatus: GameStatus;
@@ -25,12 +36,11 @@ interface GameSceneProps {
   onSongEnd: () => void;
 }
 
-const DiffuseBlob: React.FC<{ position: [number, number, number], scale: number, color: string }> = ({ position, scale, color }) => {
+const DiffuseBlob: React.FC<{ position: [number, number, number], scale: number, color: string }> = ({ position, scale, color: blobColor }) => {
     return (
-        // Added standard R3F intrinsic elements mesh, sphereGeometry, meshBasicMaterial
         <mesh position={position}>
             <sphereGeometry args={[scale, 32, 32]} />
-            <meshBasicMaterial color={color} transparent opacity={0.12} />
+            <meshBasicMaterial color={blobColor} transparent opacity={0.12} />
         </mesh>
     );
 };
@@ -70,7 +80,6 @@ const HexagonalTrack = () => {
 };
 
 const TextureMesh: React.FC<{ url: string }> = ({ url }) => {
-    // 异步加载纹理，受内部 Suspense 保护
     const texture = useTexture(url);
     return (
         <mesh position={[0, 10, -50]}>
@@ -174,7 +183,6 @@ const GameScene: React.FC<GameSceneProps> = ({
   return (
     <>
       <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 2.0, 6]} fov={50} />
-      {/* Added color, fog, ambientLight, directionalLight elements */}
       <color attach="background" args={[COLORS.track]} />
       <fog attach="fog" args={[COLORS.track, 45, 75]} />
       

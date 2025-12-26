@@ -4,11 +4,19 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-/// <reference types="@react-three/fiber" />
 import React, { useRef } from 'react';
-import { useFrame, ThreeElements } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { HandType, COLORS } from '../types';
+
+// Define intrinsic elements to satisfy TypeScript when @react-three/fiber types are not globally recognized.
+const mesh = 'mesh' as any;
+const group = 'group' as any;
+const cylinderGeometry = 'cylinderGeometry' as any;
+const meshStandardMaterial = 'meshStandardMaterial' as any;
+const torusGeometry = 'torusGeometry' as any;
+const sphereGeometry = 'sphereGeometry' as any;
+const meshBasicMaterial = 'meshBasicMaterial' as any;
 
 interface SaberProps {
   type: HandType;
@@ -67,7 +75,6 @@ const Saber: React.FC<SaberProps> = ({ type, positionRef, velocityRef }) => {
   const color = type === 'left' ? COLORS.left : COLORS.right;
 
   return (
-    // Added group, mesh, cylinderGeometry, torusGeometry, sphereGeometry intrinsic elements
     <group ref={meshRef}>
       {/* --- DRUMSTICK MODEL (Gubang) --- */}
       
