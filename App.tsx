@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -34,6 +35,7 @@ const App: React.FC = () => {
 
   const generateAIBackgroundWithRetry = async (fileName: string, retries = 2) => {
     setIsGeneratingBg(true);
+    // Initialize GoogleGenAI right before making the API call as per guidelines.
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `A beautiful, cute, and minimalist traditional Chinese ink painting background for a music game. 
     Theme: "${fileName.replace(/\.[^/.]+$/, "")}". 
@@ -42,11 +44,13 @@ const App: React.FC = () => {
 
     for (let i = 0; i <= retries; i++) {
       try {
+        // Call generateContent for text-to-image with gemini-2.5-flash-image.
         const response = await ai.models.generateContent({
           model: 'gemini-2.5-flash-image',
-          contents: [{ parts: [{ text: prompt }] }],
+          contents: { parts: [{ text: prompt }] },
         });
 
+        // Iterate through all parts to extract the generated image.
         for (const part of response.candidates?.[0]?.content?.parts || []) {
           if (part.inlineData) {
             const imageUrl = `data:image/png;base64,${part.inlineData.data}`;

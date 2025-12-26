@@ -1,10 +1,12 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
 
+/// <reference types="@react-three/fiber" />
 import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, ThreeElements } from '@react-three/fiber';
 import { PerspectiveCamera, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { GameStatus, NoteData, HandPositions, COLORS } from '../types';
@@ -25,6 +27,7 @@ interface GameSceneProps {
 
 const DiffuseBlob: React.FC<{ position: [number, number, number], scale: number, color: string }> = ({ position, scale, color }) => {
     return (
+        // Added standard R3F intrinsic elements mesh, sphereGeometry, meshBasicMaterial
         <mesh position={position}>
             <sphereGeometry args={[scale, 32, 32]} />
             <meshBasicMaterial color={color} transparent opacity={0.12} />
@@ -171,6 +174,7 @@ const GameScene: React.FC<GameSceneProps> = ({
   return (
     <>
       <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 2.0, 6]} fov={50} />
+      {/* Added color, fog, ambientLight, directionalLight elements */}
       <color attach="background" args={[COLORS.track]} />
       <fog attach="fog" args={[COLORS.track, 45, 75]} />
       

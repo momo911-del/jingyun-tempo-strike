@@ -1,11 +1,12 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
 
-
+/// <reference types="@react-three/fiber" />
 import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, ThreeElements } from '@react-three/fiber';
 import * as THREE from 'three';
 import { HandType, COLORS } from '../types';
 
@@ -66,6 +67,7 @@ const Saber: React.FC<SaberProps> = ({ type, positionRef, velocityRef }) => {
   const color = type === 'left' ? COLORS.left : COLORS.right;
 
   return (
+    // Added group, mesh, cylinderGeometry, torusGeometry, sphereGeometry intrinsic elements
     <group ref={meshRef}>
       {/* --- DRUMSTICK MODEL (Gubang) --- */}
       
