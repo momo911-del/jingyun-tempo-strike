@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { GameStatus, NoteData } from './types';
 import { useMediaPipe } from './hooks/useMediaPipe';
@@ -151,16 +151,18 @@ const App: React.FC = () => {
       <video ref={videoRef} className="absolute opacity-0 pointer-events-none" playsInline muted autoPlay />
       
       <Canvas shadows dpr={[1, 2]}>
-          <GameScene 
-            gameStatus={gameStatus} 
-            audioRef={audioRef} 
-            handPositionsRef={handPositionsRef}
-            chart={chart}
-            backgroundUrl={backgroundUrl}
-            onNoteHit={handleNoteHit}
-            onNoteMiss={handleNoteMiss}
-            onSongEnd={() => setGameStatus(GameStatus.VICTORY)}
-          />
+          <Suspense fallback={null}>
+              <GameScene 
+                gameStatus={gameStatus} 
+                audioRef={audioRef} 
+                handPositionsRef={handPositionsRef}
+                chart={chart}
+                backgroundUrl={backgroundUrl}
+                onNoteHit={handleNoteHit}
+                onNoteMiss={handleNoteMiss}
+                onSongEnd={() => setGameStatus(GameStatus.VICTORY)}
+              />
+          </Suspense>
       </Canvas>
 
       <WebcamPreview videoRef={videoRef} resultsRef={lastResultsRef} isCameraReady={isCameraReady} />
@@ -192,7 +194,7 @@ const App: React.FC = () => {
             <div className="text-center drop-shadow-[0_2px_10px_rgba(255,255,255,0.9)]">
               <div className="text-5xl font-black ink-text text-[#1a1a1a]">{score.toLocaleString()}</div>
               <div className={`text-2xl font-bold ink-text transition-all duration-300 ${combo > 0 ? 'scale-110 text-[#c02c38]' : 'opacity-0'}`}>
-                {combo} 连击
+                {combo}连击
               </div>
             </div>
 
