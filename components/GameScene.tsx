@@ -13,17 +13,17 @@ import { PLAYER_Z, SPAWN_Z, MISS_Z, NOTE_SPEED, HEX_RADIUS, HEX_CENTER_Y, getLan
 import Note from './Note';
 import Saber from './Saber';
 
-// Define intrinsic elements to satisfy TypeScript when @react-three/fiber types are not globally recognized.
-const mesh = 'mesh' as any;
-const group = 'group' as any;
-const sphereGeometry = 'sphereGeometry' as any;
-const meshBasicMaterial = 'meshBasicMaterial' as any;
-const planeGeometry = 'planeGeometry' as any;
-const ringGeometry = 'ringGeometry' as any;
-const ambientLight = 'ambientLight' as any;
-const directionalLight = 'directionalLight' as any;
-const fog = 'fog' as any;
-const color = 'color' as any;
+// Define capitalized constants for Three.js elements to bypass JSX intrinsic element type errors.
+const Mesh = 'mesh' as any;
+const Group = 'group' as any;
+const SphereGeometry = 'sphereGeometry' as any;
+const MeshBasicMaterial = 'meshBasicMaterial' as any;
+const PlaneGeometry = 'planeGeometry' as any;
+const RingGeometry = 'ringGeometry' as any;
+const Color_ = 'color' as any;
+const Fog_ = 'fog' as any;
+const AmbientLight = 'ambientLight' as any;
+const DirectionalLight = 'directionalLight' as any;
 
 interface GameSceneProps {
   gameStatus: GameStatus;
@@ -36,12 +36,13 @@ interface GameSceneProps {
   onSongEnd: () => void;
 }
 
-const DiffuseBlob: React.FC<{ position: [number, number, number], scale: number, color: string }> = ({ position, scale, color: blobColor }) => {
+const DiffuseBlob: React.FC<{ position: [number, number, number], scale: number, color: string }> = ({ position, scale, color }) => {
     return (
-        <mesh position={position}>
-            <sphereGeometry args={[scale, 32, 32]} />
-            <meshBasicMaterial color={blobColor} transparent opacity={0.12} />
-        </mesh>
+        // Using capitalized constants to avoid JSX intrinsic element type errors.
+        <Mesh position={position}>
+            <SphereGeometry args={[scale, 32, 32]} />
+            <MeshBasicMaterial color={color} transparent opacity={0.12} />
+        </Mesh>
     );
 };
 
@@ -49,54 +50,55 @@ const HexagonalTrack = () => {
     const lanes = Array.from({ length: 6 }).map((_, i) => getLanePosition(i));
     
     return (
-        <group position={[0, 0, -25]}>
+        <Group position={[0, 0, -25]}>
             {/* 6 Lanes in Hexagonal Pattern */}
             {lanes.map((pos, i) => (
-                <group key={i} position={[pos.x, pos.y, 0]} rotation={[0, 0, (i * (Math.PI / 3)) + (Math.PI / 6)]}>
+                <Group key={i} position={[pos.x, pos.y, 0]} rotation={[0, 0, (i * (Math.PI / 3)) + (Math.PI / 6)]}>
                     {/* Lane Path */}
-                    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
-                        <planeGeometry args={[0.3, 100]} />
-                        <meshBasicMaterial color={COLORS.ink} transparent opacity={0.05} />
-                    </mesh>
+                    <Mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
+                        <PlaneGeometry args={[0.3, 100]} />
+                        <MeshBasicMaterial color={COLORS.ink} transparent opacity={0.05} />
+                    </Mesh>
                     {/* Glowing Core Line */}
-                    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-                        <planeGeometry args={[0.02, 100]} />
-                        <meshBasicMaterial color={i % 2 === 0 ? COLORS.glowRed : COLORS.glowCyan} transparent opacity={0.3} />
-                    </mesh>
-                </group>
+                    <Mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+                        <PlaneGeometry args={[0.02, 100]} />
+                        <MeshBasicMaterial color={i % 2 === 0 ? COLORS.glowRed : COLORS.glowCyan} transparent opacity={0.3} />
+                    </Mesh>
+                </Group>
             ))}
 
             {/* Hit Zone Highlight - A hexagonal ring */}
-            <mesh position={[0, HEX_CENTER_Y, 25]} rotation={[0, 0, Math.PI / 6]}>
-                <ringGeometry args={[HEX_RADIUS - 0.2, HEX_RADIUS + 0.2, 6]} />
-                <meshBasicMaterial color={COLORS.ink} transparent opacity={0.1} />
-            </mesh>
-            <mesh position={[0, HEX_CENTER_Y, 25.1]} rotation={[0, 0, Math.PI / 6]}>
-                <ringGeometry args={[HEX_RADIUS - 0.05, HEX_RADIUS + 0.05, 6]} />
-                <meshBasicMaterial color="#c02c38" transparent opacity={0.4} />
-            </mesh>
-        </group>
+            <Mesh position={[0, HEX_CENTER_Y, 25]} rotation={[0, 0, Math.PI / 6]}>
+                <RingGeometry args={[HEX_RADIUS - 0.2, HEX_RADIUS + 0.2, 6]} />
+                <MeshBasicMaterial color={COLORS.ink} transparent opacity={0.1} />
+            </Mesh>
+            <Mesh position={[0, HEX_CENTER_Y, 25.1]} rotation={[0, 0, Math.PI / 6]}>
+                <RingGeometry args={[HEX_RADIUS - 0.05, HEX_RADIUS + 0.05, 6]} />
+                <MeshBasicMaterial color="#c02c38" transparent opacity={0.4} />
+            </Mesh>
+        </Group>
     );
 };
 
 const TextureMesh: React.FC<{ url: string }> = ({ url }) => {
+    // 异步加载纹理，受内部 Suspense 保护
     const texture = useTexture(url);
     return (
-        <mesh position={[0, 10, -50]}>
-            <planeGeometry args={[100, 56.25]} />
-            <meshBasicMaterial map={texture} transparent opacity={0.9} />
-        </mesh>
+        <Mesh position={[0, 10, -50]}>
+            <PlaneGeometry args={[100, 56.25]} />
+            <MeshBasicMaterial map={texture} transparent opacity={0.9} />
+        </Mesh>
     );
 };
 
 const DefaultBackground = () => (
-    <group position={[0, 0, -45]}>
+    <Group position={[0, 0, -45]}>
         <DiffuseBlob position={[-30, 10, -5]} scale={15} color="#ffcfd2" />
         <DiffuseBlob position={[25, 15, -10]} scale={20} color="#cfdcff" />
         <DiffuseBlob position={[-15, -10, 5]} scale={25} color="#e2ffcf" />
         <DiffuseBlob position={[10, -5, 0]} scale={12} color="#fff4cf" />
         <DiffuseBlob position={[0, 25, -20]} scale={30} color="#f4cfff" />
-    </group>
+    </Group>
 );
 
 const BackgroundLayer: React.FC<{ url: string | null }> = ({ url }) => {
@@ -183,11 +185,12 @@ const GameScene: React.FC<GameSceneProps> = ({
   return (
     <>
       <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 2.0, 6]} fov={50} />
-      <color attach="background" args={[COLORS.track]} />
-      <fog attach="fog" args={[COLORS.track, 45, 75]} />
+      {/* Using capitalized constants for intrinsic elements to fix type errors. */}
+      <Color_ attach="background" args={[COLORS.track]} />
+      <Fog_ attach="fog" args={[COLORS.track, 45, 75]} />
       
-      <ambientLight intensity={2.2} />
-      <directionalLight position={[10, 25, 10]} intensity={0.8} />
+      <AmbientLight intensity={2.2} />
+      <DirectionalLight position={[10, 25, 10]} intensity={0.8} />
 
       <BackgroundLayer url={backgroundUrl} />
 

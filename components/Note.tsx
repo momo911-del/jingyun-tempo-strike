@@ -10,15 +10,15 @@ import * as THREE from 'three';
 import { NoteData, COLORS } from '../types';
 import { getLanePosition, NOTE_SIZE } from '../constants';
 
-// Define intrinsic elements to satisfy TypeScript when @react-three/fiber types are not globally recognized.
-const mesh = 'mesh' as any;
-const group = 'group' as any;
-const sphereGeometry = 'sphereGeometry' as any;
-const meshBasicMaterial = 'meshBasicMaterial' as any;
-const cylinderGeometry = 'cylinderGeometry' as any;
-const meshStandardMaterial = 'meshStandardMaterial' as any;
-const ringGeometry = 'ringGeometry' as any;
-const circleGeometry = 'circleGeometry' as any;
+// Define capitalized constants for Three.js elements to bypass JSX intrinsic element type errors.
+const Group = 'group' as any;
+const Mesh = 'mesh' as any;
+const RingGeometry = 'ringGeometry' as any;
+const MeshBasicMaterial = 'meshBasicMaterial' as any;
+const SphereGeometry = 'sphereGeometry' as any;
+const CylinderGeometry = 'cylinderGeometry' as any;
+const MeshStandardMaterial = 'meshStandardMaterial' as any;
+const CircleGeometry = 'circleGeometry' as any;
 
 interface NoteProps {
   data: NoteData;
@@ -45,22 +45,23 @@ const Debris: React.FC<{ data: NoteData, timeSinceHit: number, color: string }> 
     });
 
     return (
-        <group ref={groupRef}>
-             <mesh rotation={[Math.PI/2, 0, 0]}>
-                 <ringGeometry args={[0.3, 1.5 + timeSinceHit * 5, 32]} />
-                 <meshBasicMaterial color={color} transparent opacity={0.6 * (1 - timeSinceHit * 2)} />
-             </mesh>
+        // Using capitalized constants to avoid JSX intrinsic element type errors.
+        <Group ref={groupRef}>
+             <Mesh rotation={[Math.PI/2, 0, 0]}>
+                 <RingGeometry args={[0.3, 1.5 + timeSinceHit * 5, 32]} />
+                 <MeshBasicMaterial color={color} transparent opacity={0.6 * (1 - timeSinceHit * 2)} />
+             </Mesh>
              {particles.map((p, i) => (
-                 <mesh key={i} position={[
+                 <Mesh key={i} position={[
                      p.dir.x * p.speed * timeSinceHit,
                      p.dir.y * p.speed * timeSinceHit,
                      p.dir.z * p.speed * timeSinceHit
                  ]}>
-                     <sphereGeometry args={[p.size]} />
-                     <meshBasicMaterial color={i % 2 === 0 ? color : COLORS.ink} />
-                 </mesh>
+                     <SphereGeometry args={[p.size]} />
+                     <MeshBasicMaterial color={i % 2 === 0 ? color : COLORS.ink} />
+                 </Mesh>
              ))}
-        </group>
+        </Group>
     );
 };
 
@@ -83,43 +84,44 @@ const Note: React.FC<NoteProps> = ({ data, zPos, currentTime }) => {
 
   if (data.hit && data.hitTime) {
       return (
-          <group position={position}>
+          <Group position={position}>
               <Debris data={data} timeSinceHit={currentTime - data.hitTime} color={color} />
-          </group>
+          </Group>
       );
   }
 
   return (
-    <group position={position} rotation={[Math.PI / 2, 0, rotationZ]}>
+    // Using capitalized constants for intrinsic elements to fix type errors.
+    <Group position={position} rotation={[Math.PI / 2, 0, rotationZ]}>
       {/* Glow Aura */}
-      <mesh scale={[1.3, 1, 1.3]}>
-          <cylinderGeometry args={[NOTE_SIZE, NOTE_SIZE, 0.1, 16]} />
-          <meshBasicMaterial color={glow} transparent opacity={0.2} />
-      </mesh>
+      <Mesh scale={[1.3, 1, 1.3]}>
+          <CylinderGeometry args={[NOTE_SIZE, NOTE_SIZE, 0.1, 16]} />
+          <MeshBasicMaterial color={glow} transparent opacity={0.2} />
+      </Mesh>
 
       {/* Drum Body */}
-      <mesh castShadow>
-         <cylinderGeometry args={[NOTE_SIZE, NOTE_SIZE, 0.3, 32]} />
-         <meshStandardMaterial color={COLORS.ink} roughness={0.3} />
-      </mesh>
+      <Mesh castShadow>
+         <CylinderGeometry args={[NOTE_SIZE, NOTE_SIZE, 0.3, 32]} />
+         <MeshStandardMaterial color={COLORS.ink} roughness={0.3} />
+      </Mesh>
       
       {/* Drum Skin */}
-      <mesh position={[0, 0.16, 0]}>
-         <cylinderGeometry args={[NOTE_SIZE * 0.9, NOTE_SIZE * 0.9, 0.02, 32]} />
-         <meshStandardMaterial color={COLORS.track} roughness={0.9} />
-      </mesh>
+      <Mesh position={[0, 0.16, 0]}>
+         <CylinderGeometry args={[NOTE_SIZE * 0.9, NOTE_SIZE * 0.9, 0.02, 32]} />
+         <MeshStandardMaterial color={COLORS.track} roughness={0.9} />
+      </Mesh>
 
       {/* Pattern */}
-      <mesh position={[0, 0.18, 0]}>
-         <ringGeometry args={[NOTE_SIZE * 0.5, NOTE_SIZE * 0.7, 32]} />
-         <meshBasicMaterial color={color} />
-      </mesh>
+      <Mesh position={[0, 0.18, 0]}>
+         <RingGeometry args={[NOTE_SIZE * 0.5, NOTE_SIZE * 0.7, 32]} />
+         <MeshBasicMaterial color={color} />
+      </Mesh>
 
-      <mesh position={[0, 0.18, 0]}>
-         <circleGeometry args={[NOTE_SIZE * 0.2, 32]} />
-         <meshBasicMaterial color={COLORS.ink} />
-      </mesh>
-    </group>
+      <Mesh position={[0, 0.18, 0]}>
+         <CircleGeometry args={[NOTE_SIZE * 0.2, 32]} />
+         <MeshBasicMaterial color={COLORS.ink} />
+      </Mesh>
+    </Group>
   );
 };
 

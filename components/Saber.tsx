@@ -5,18 +5,18 @@
 */
 
 import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, ThreeElements } from '@react-three/fiber';
 import * as THREE from 'three';
 import { HandType, COLORS } from '../types';
 
-// Define intrinsic elements to satisfy TypeScript when @react-three/fiber types are not globally recognized.
-const mesh = 'mesh' as any;
-const group = 'group' as any;
-const cylinderGeometry = 'cylinderGeometry' as any;
-const meshStandardMaterial = 'meshStandardMaterial' as any;
-const torusGeometry = 'torusGeometry' as any;
-const sphereGeometry = 'sphereGeometry' as any;
-const meshBasicMaterial = 'meshBasicMaterial' as any;
+// Define capitalized constants for Three.js elements to bypass JSX intrinsic element type errors.
+const Group = 'group' as any;
+const Mesh = 'mesh' as any;
+const CylinderGeometry = 'cylinderGeometry' as any;
+const MeshStandardMaterial = 'meshStandardMaterial' as any;
+const TorusGeometry = 'torusGeometry' as any;
+const SphereGeometry = 'sphereGeometry' as any;
+const MeshBasicMaterial = 'meshBasicMaterial' as any;
 
 interface SaberProps {
   type: HandType;
@@ -75,40 +75,41 @@ const Saber: React.FC<SaberProps> = ({ type, positionRef, velocityRef }) => {
   const color = type === 'left' ? COLORS.left : COLORS.right;
 
   return (
-    <group ref={meshRef}>
+    // Using capitalized constants for intrinsic elements to fix type errors.
+    <Group ref={meshRef}>
       {/* --- DRUMSTICK MODEL (Gubang) --- */}
       
       {/* Main Stick - Tapered Wood */}
-      <mesh position={[0, stickLength / 2 - 0.1, 0]}>
+      <Mesh position={[0, stickLength / 2 - 0.1, 0]}>
         {/* RadiusTop smaller than RadiusBottom for taper */}
-        <cylinderGeometry args={[0.015, 0.025, stickLength, 12]} />
-        <meshStandardMaterial color="#8b5a2b" roughness={0.7} /> 
-      </mesh>
+        <CylinderGeometry args={[0.015, 0.025, stickLength, 12]} />
+        <MeshStandardMaterial color="#8b5a2b" roughness={0.7} /> 
+      </Mesh>
 
       {/* Handle Wrapping (Cloth/Ink style) */}
-      <mesh position={[0, -0.1, 0]}>
-        <cylinderGeometry args={[0.028, 0.028, 0.2, 12]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.9} />
-      </mesh>
+      <Mesh position={[0, -0.1, 0]}>
+        <CylinderGeometry args={[0.028, 0.028, 0.2, 12]} />
+        <MeshStandardMaterial color="#1a1a1a" roughness={0.9} />
+      </Mesh>
 
       {/* Decorative Tassel Ring */}
-      <mesh position={[0, -0.2, 0]}>
-         <torusGeometry args={[0.02, 0.005, 8, 16]} />
-         <meshStandardMaterial color="#d4af37" metalness={0.8} roughness={0.2} /> {/* Gold */}
-      </mesh>
+      <Mesh position={[0, -0.2, 0]}>
+         <TorusGeometry args={[0.02, 0.005, 8, 16]} />
+         <MeshStandardMaterial color="#d4af37" metalness={0.8} roughness={0.2} /> {/* Gold */}
+      </Mesh>
 
       {/* Tassel (Simple cylinder representation) */}
-      <mesh position={[0, -0.25, 0]}>
-         <cylinderGeometry args={[0.005, 0.02, 0.1, 8]} />
-         <meshBasicMaterial color={color} />
-      </mesh>
+      <Mesh position={[0, -0.25, 0]}>
+         <CylinderGeometry args={[0.005, 0.02, 0.1, 8]} />
+         <MeshBasicMaterial color={color} />
+      </Mesh>
 
       {/* Tip (Striking point) */}
-      <mesh position={[0, stickLength / 2 + 0.05 - 0.1, 0]}>
-         <sphereGeometry args={[0.02]} />
-         <meshStandardMaterial color="#e6ccb2" roughness={0.5} />
-      </mesh>
-    </group>
+      <Mesh position={[0, stickLength / 2 + 0.05 - 0.1, 0]}>
+         <SphereGeometry args={[0.02]} />
+         <MeshStandardMaterial color="#e6ccb2" roughness={0.5} />
+      </Mesh>
+    </Group>
   );
 };
 
