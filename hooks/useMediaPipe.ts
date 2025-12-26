@@ -1,4 +1,3 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -8,18 +7,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { HandLandmarker, FilesetResolver, HandLandmarkerResult } from '@mediapipe/tasks-vision';
 import * as THREE from 'three';
 
-// Mapping 2D normalized coordinates to 3D game world.
 const mapHandToWorld = (x: number, y: number): THREE.Vector3 => {
-  // Increased ranges to "expand" the viewfinder's reach in the virtual world.
-  // Smaller physical hand movement now results in larger 3D movement.
   const GAME_X_RANGE = 7.5; 
   const GAME_Y_RANGE = 6.0;
   const Y_OFFSET = 1.2;
 
-  // MediaPipe often returns mirrored X if facingMode is 'user'.
   const worldX = (0.5 - x) * GAME_X_RANGE; 
   const worldY = (1.0 - y) * GAME_Y_RANGE - (GAME_Y_RANGE / 2) + Y_OFFSET;
-
   const worldZ = -Math.max(0, worldY * 0.1);
 
   return new THREE.Vector3(worldX, Math.max(0.1, worldY), worldZ);
@@ -29,19 +23,11 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handPositionsRef = useRef<{
-    left: THREE.Vector3 | null;
-    right: THREE.Vector3 | null;
-    lastLeft: THREE.Vector3 | null;
-    lastRight: THREE.Vector3 | null;
-    leftVelocity: THREE.Vector3;
-    rightVelocity: THREE.Vector3;
-    lastTimestamp: number;
-  }>({
-    left: null,
-    right: null,
-    lastLeft: null,
-    lastRight: null,
+  const handPositionsRef = useRef({
+    left: null as THREE.Vector3 | null,
+    right: null as THREE.Vector3 | null,
+    lastLeft: null as THREE.Vector3 | null,
+    lastRight: null as THREE.Vector3 | null,
     leftVelocity: new THREE.Vector3(0,0,0),
     rightVelocity: new THREE.Vector3(0,0,0),
     lastTimestamp: 0
@@ -80,10 +66,12 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
         }
 
         landmarkerRef.current = landmarker;
-        startCamera();
+        await startCamera();
       } catch (err: any) {
-        console.error("Error initializing MediaPipe:", err);
-        setError(`Failed to load hand tracking: ${err.message}`);
+        if (isActive) {
+          console.error("Error initializing MediaPipe:", err);
+          setError(`Failed to load hand tracking: ${err.message}`);
+        }
       }
     };
 
@@ -107,8 +95,10 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
           };
         }
       } catch (err) {
-        console.error("Camera Error:", err);
-        setError("Could not access camera.");
+        if (isActive) {
+          console.error("Camera Error:", err);
+          setError("Could not access camera.");
+        }
       }
     };
 
@@ -123,10 +113,9 @@ export const useMediaPipe = (videoRef: React.RefObject<HTMLVideoElement | null>)
                  lastResultsRef.current = results;
                  processResults(results);
              } catch (e) {
-                 console.warn("Detection failed this frame", e);
+                 // Non-fatal error
              }
         }
-
         requestRef.current = requestAnimationFrame(predictWebcam);
     };
 

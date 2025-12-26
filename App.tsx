@@ -1,4 +1,3 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -142,7 +141,7 @@ const App: React.FC = () => {
   }, [isCameraReady, gameStatus]);
 
   return (
-    <div className="relative w-full h-screen bg-[#f4f1e8] overflow-hidden font-serif">
+    <div className="relative w-full h-full bg-[#f4f1e8] overflow-hidden font-serif">
       <video ref={videoRef} className="absolute opacity-0 pointer-events-none" playsInline muted autoPlay />
       
       <Canvas shadows dpr={[1, 2]}>
@@ -162,94 +161,93 @@ const App: React.FC = () => {
 
       {/* UI Overlay */}
       {(gameStatus === GameStatus.PLAYING || gameStatus === GameStatus.PAUSED) && (
-        <div className="absolute inset-0 pointer-events-none p-8 z-10 flex flex-col justify-between">
+        <div className="absolute inset-0 pointer-events-none p-4 z-10 flex flex-col justify-between">
           <div className="flex justify-between items-start w-full">
-            <div className="w-72 pointer-events-auto bg-white/70 backdrop-blur-xl p-4 rounded-2xl border-2 border-[#1a1a1a]/10 shadow-2xl">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Flame className={`w-6 h-6 ${health < 30 ? 'animate-pulse text-[#c02c38]' : 'text-[#2e5e6e]'}`} fill="currentColor" />
-                  <span className="ink-text text-3xl font-bold tracking-[0.2em] text-[#1a1a1a]">精气神</span>
+            <div className="w-56 pointer-events-auto bg-white/70 backdrop-blur-xl p-3 rounded-2xl border-2 border-[#1a1a1a]/10 shadow-2xl">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1">
+                  <Flame className={`w-5 h-5 ${health < 30 ? 'animate-pulse text-[#c02c38]' : 'text-[#2e5e6e]'}`} fill="currentColor" />
+                  <span className="ink-text text-xl font-bold tracking-[0.1em] text-[#1a1a1a]">精气神</span>
                 </div>
-                <span className="font-bold text-[#1a1a1a]">{Math.ceil(health)}%</span>
+                <span className="font-bold text-xs text-[#1a1a1a]">{Math.ceil(health)}%</span>
               </div>
-              <div className="h-4 bg-[#1a1a1a]/5 rounded-full border border-[#1a1a1a]/20 overflow-hidden">
+              <div className="h-3 bg-[#1a1a1a]/5 rounded-full border border-[#1a1a1a]/20 overflow-hidden">
                 <div 
                   className={`h-full transition-all duration-300 ${health > 60 ? 'bg-[#2e5e6e]' : health > 30 ? 'bg-orange-500' : 'bg-[#c02c38]'}`}
                   style={{ width: `${health}%` }}
                 />
               </div>
-              <div className="mt-3 flex justify-between items-center text-sm font-bold">
-                <span className="px-2 py-0.5 bg-[#1a1a1a] text-[#f4f1e8] rounded">倒计时</span>
-                <span className="text-2xl tracking-widest text-[#1a1a1a]">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
+              <div className="mt-2 flex justify-between items-center text-xs font-bold">
+                <span className="px-1.5 py-0.5 bg-[#1a1a1a] text-[#f4f1e8] rounded">倒计时</span>
+                <span className="text-lg tracking-widest text-[#1a1a1a]">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
               </div>
             </div>
 
             <div className="text-center drop-shadow-[0_2px_10px_rgba(255,255,255,0.9)]">
-              <div className="text-8xl font-black ink-text text-[#1a1a1a]">{score.toLocaleString()}</div>
-              <div className={`text-4xl font-bold ink-text transition-all duration-300 ${combo > 0 ? 'scale-110 text-[#c02c38]' : 'opacity-0'}`}>
+              <div className="text-5xl font-black ink-text text-[#1a1a1a]">{score.toLocaleString()}</div>
+              <div className={`text-2xl font-bold ink-text transition-all duration-300 ${combo > 0 ? 'scale-110 text-[#c02c38]' : 'opacity-0'}`}>
                 {combo} 连击
               </div>
             </div>
 
-            <div className="flex gap-4 pointer-events-auto">
-              <button onClick={togglePause} className="p-5 bg-white border-2 border-[#1a1a1a] rounded-full hover:bg-gray-100 shadow-xl transition-all active:scale-90">
-                {gameStatus === GameStatus.PAUSED ? <Play size={32} color="#1a1a1a" /> : <Pause size={32} color="#1a1a1a" />}
+            <div className="flex gap-2 pointer-events-auto">
+              <button onClick={togglePause} className="p-3 bg-white border-2 border-[#1a1a1a] rounded-full hover:bg-gray-100 shadow-xl transition-all active:scale-90">
+                {gameStatus === GameStatus.PAUSED ? <Play size={24} color="#1a1a1a" /> : <Pause size={24} color="#1a1a1a" />}
               </button>
-              <button onClick={resetGame} className="p-5 bg-[#c02c38] text-white border-2 border-[#1a1a1a] rounded-full hover:brightness-110 shadow-xl transition-all active:scale-90">
-                <LogOut size={32} />
+              <button onClick={resetGame} className="p-3 bg-[#c02c38] text-white border-2 border-[#1a1a1a] rounded-full hover:brightness-110 shadow-xl transition-all active:scale-90">
+                <LogOut size={24} />
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Initial Landing Screen - Scaled down */}
+      {/* Initial Landing Screen - Scaled down for embedding */}
       {gameStatus === GameStatus.IDLE && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#f4f1e8]/98 z-20 overflow-auto py-8">
-          <div className="bg-white p-12 md:p-16 border-4 border-[#1a1a1a] text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] max-w-xl w-full rounded-[3rem] transform scale-[0.8] transition-transform flex flex-col items-center">
-            <h1 className="text-[8rem] leading-none ink-text mb-6 text-[#1a1a1a]">京韵<span className="text-[#c02c38]">鼓神</span></h1>
+        <div className="absolute inset-0 flex items-center justify-center bg-[#f4f1e8]/98 z-20">
+          <div className="bg-white p-8 md:p-10 border-4 border-[#1a1a1a] text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] max-w-lg w-full rounded-[2.5rem] transform scale-[0.85] transition-transform flex flex-col items-center">
+            <h1 className="text-[6rem] leading-none ink-text mb-4 text-[#1a1a1a]">京韵<span className="text-[#c02c38]">鼓神</span></h1>
             
-            <div className="w-full mb-8 p-8 border-4 border-dashed border-[#2e5e6e]/20 rounded-[2rem] bg-[#2e5e6e]/5 flex flex-col items-center">
+            <div className="w-full mb-6 p-6 border-4 border-dashed border-[#2e5e6e]/20 rounded-[1.5rem] bg-[#2e5e6e]/5 flex flex-col items-center">
               <label className="flex flex-col items-center cursor-pointer group">
                 {isGeneratingBg ? (
-                   <Sparkles className="mb-4 text-[#c02c38] animate-spin" size={64} />
+                   <Sparkles className="mb-3 text-[#c02c38] animate-spin" size={48} />
                 ) : (
-                   <Music className="mb-4 text-[#2e5e6e] group-hover:scale-110 transition-transform duration-300" size={64} />
+                   <Music className="mb-3 text-[#2e5e6e] group-hover:scale-110 transition-transform duration-300" size={48} />
                 )}
-                <span className="ink-text text-2xl mb-4 font-bold text-[#1a1a1a]">
+                <span className="ink-text text-xl mb-3 font-bold text-[#1a1a1a]">
                   {isGeneratingBg ? "AI 画师正在作画..." : audioUrl ? "曲谱与景致已备齐" : "请上传背景音律"}
                 </span>
                 <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
-                <div className="bg-[#1a1a1a] text-[#f4f1e8] px-8 py-3 rounded-full ink-text text-xl hover:bg-[#333] transition-colors shadow-lg">选择曲目 (MP3)</div>
+                <div className="bg-[#1a1a1a] text-[#f4f1e8] px-6 py-2 rounded-full ink-text text-lg hover:bg-[#333] transition-colors shadow-lg">选择曲目 (MP3)</div>
               </label>
             </div>
 
             <button 
               disabled={!audioUrl || isGeneratingBg}
               onClick={startGame}
-              className={`w-full py-6 text-4xl font-bold border-4 border-[#1a1a1a] transition-all ink-text flex items-center justify-center gap-6 rounded-[1.5rem]
+              className={`w-full py-4 text-3xl font-bold border-4 border-[#1a1a1a] transition-all ink-text flex items-center justify-center gap-4 rounded-[1.2rem]
                 ${(!audioUrl || isGeneratingBg) ? 'bg-gray-200 text-gray-400 cursor-not-allowed border-gray-300' : 'bg-[#c02c38] text-white hover:shadow-[0_10px_30px_rgba(192,44,56,0.3)] active:scale-95'}`}
             >
-              <Play fill="white" size={40} /> 开 场
+              <Play fill="white" size={32} /> 开 场
             </button>
-            <p className="mt-6 text-gray-400 font-bold tracking-[0.2em] italic text-md opacity-60 uppercase">Performance Time: 90 Seconds</p>
           </div>
         </div>
       )}
 
-      {/* Result Screens - '功德' removed */}
+      {/* Result Screens */}
       {(gameStatus === GameStatus.GAME_OVER || gameStatus === GameStatus.VICTORY) && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]/60 backdrop-blur-md z-30 p-4">
-          <div className="bg-[#f4f1e8] p-16 border-4 border-[#1a1a1a] text-center shadow-2xl max-w-lg rounded-[2.5rem] transform scale-[0.85]">
-            <h2 className={`text-[7rem] leading-none ink-text mb-8 ${gameStatus === GameStatus.VICTORY ? 'text-[#2e5e6e]' : 'text-[#c02c38]'}`}>
+          <div className="bg-[#f4f1e8] p-10 border-4 border-[#1a1a1a] text-center shadow-2xl max-w-sm rounded-[2rem] transform scale-[0.9]">
+            <h2 className={`text-[5rem] leading-none ink-text mb-6 ${gameStatus === GameStatus.VICTORY ? 'text-[#2e5e6e]' : 'text-[#c02c38]'}`}>
               {gameStatus === GameStatus.VICTORY ? "曲终奏雅" : "气数已尽"}
             </h2>
-            <div className="space-y-4 mb-10">
-                <p className="text-3xl font-serif font-black text-[#1a1a1a] opacity-60">得分</p>
-                <p className="text-8xl font-black ink-text text-[#1a1a1a]">{score.toLocaleString()}</p>
+            <div className="space-y-2 mb-8">
+                <p className="text-xl font-serif font-black text-[#1a1a1a] opacity-60">得分</p>
+                <p className="text-6xl font-black ink-text text-[#1a1a1a]">{score.toLocaleString()}</p>
             </div>
-            <button onClick={resetGame} className="bg-[#1a1a1a] text-[#f4f1e8] px-12 py-5 text-3xl ink-text flex items-center gap-4 mx-auto rounded-full hover:brightness-125 transition-all shadow-xl active:scale-95">
-              <RefreshCw size={32} /> 重返梨园
+            <button onClick={resetGame} className="bg-[#1a1a1a] text-[#f4f1e8] px-8 py-3 text-2xl ink-text flex items-center gap-3 mx-auto rounded-full hover:brightness-125 transition-all shadow-xl active:scale-95">
+              <RefreshCw size={24} /> 重返梨园
             </button>
           </div>
         </div>

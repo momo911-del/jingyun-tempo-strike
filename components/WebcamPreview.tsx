@@ -38,7 +38,6 @@ const WebcamPreview: React.FC<WebcamPreviewProps> = ({ videoRef, resultsRef, isC
 
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                    // 1. Draw Color Video Feed (Mirrored)
                     ctx.save();
                     ctx.scale(-1, 1);
                     ctx.translate(-canvas.width, 0);
@@ -46,7 +45,6 @@ const WebcamPreview: React.FC<WebcamPreviewProps> = ({ videoRef, resultsRef, isC
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                     ctx.restore();
 
-                    // 2. Draw Landmarks
                     if (resultsRef.current?.landmarks) {
                         resultsRef.current.landmarks.forEach((landmarks, i) => {
                             const isRight = resultsRef.current?.handedness[i][0].categoryName === 'Right';
@@ -76,7 +74,7 @@ const WebcamPreview: React.FC<WebcamPreviewProps> = ({ videoRef, resultsRef, isC
     if (!isCameraReady) return null;
 
     return (
-        <div className="fixed bottom-4 right-4 w-48 h-36 bg-[#f4f1e8] border-2 border-[#1a1a1a] rounded shadow-lg overflow-hidden z-50 pointer-events-none">
+        <div className="absolute bottom-4 right-4 w-32 h-24 bg-[#f4f1e8] border-2 border-[#1a1a1a] rounded shadow-lg overflow-hidden z-50 pointer-events-none">
             <canvas ref={canvasRef} className="w-full h-full object-cover" />
         </div>
     );

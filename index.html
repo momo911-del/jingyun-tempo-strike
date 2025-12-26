@@ -1,54 +1,655 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>京韵鼓神</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>京韵·记忆 - 京韵大鼓非遗专题页</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
     <style>
-      body, html, #root {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background-color: #f4f1e8; /* 宣纸色 */
-        touch-action: none;
-        font-family: 'Noto Serif SC', serif;
-      }
-      /* Ensure canvas doesn't capture weird touch highlights on mobile */
-      canvas {
-        outline: none;
-        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-      }
-      
-      .ink-text {
-        font-family: 'Ma Shan Zheng', cursive;
-      }
+        :root {
+            --primary-red: #8E0000;      /* 京红 */
+            --accent-gold: #D4AF37;      /* 鎏金 */
+            --bg-paper: #F4F1EA;         /* 宣纸白 */
+            --text-dark: #2C2C2C;        /* 墨黑 */
+            --text-light: #666666;       /* 灰字 */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Serif SC', 'Songti SC', serif;
+            background-color: var(--bg-paper);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d4cdb8' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+            color: var(--text-dark);
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(244, 241, 234, 0.98);
+            border-bottom: 3px solid var(--primary-red);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            height: 70px;
+        }
+
+        .logo {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 32px;
+            color: var(--primary-red);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span { color: var(--text-dark); margin-left: 10px; font-size: 18px; font-family: 'Noto Serif SC'; font-weight: bold;}
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 18px;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 5px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary-red);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-red);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: 80vh;
+        }
+
+        .section {
+            display: none; 
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block; 
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-header h2 {
+            font-size: 36px;
+            color: var(--primary-red);
+            margin: 0;
+            font-family: 'ZCOOL XiaoWei', serif;
+        }
+
+        .section-header p {
+            color: var(--text-light);
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .section-header::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: var(--accent-gold);
+            margin: 20px auto 0;
+        }
+        
+        .sub-header {
+            text-align: center;
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 26px;
+            color: var(--primary-red);
+            margin: 60px 0 30px 0;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sub-header::before, .sub-header::after {
+            content: '❧';
+            color: var(--accent-gold);
+            margin: 0 10px;
+            font-size: 20px;
+        }
+
+        .ticket-table-container {
+            overflow-x: auto;
+            margin-bottom: 40px;
+            border: 1px solid #e0dcd0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            background: #fff;
+            border-radius: 8px;
+        }
+
+        .ticket-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+        }
+
+        .ticket-table th {
+            background-color: var(--primary-red);
+            color: #fff;
+            padding: 15px;
+            text-align: left;
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-weight: normal;
+        }
+
+        .ticket-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: var(--text-dark);
+            vertical-align: middle;
+        }
+
+        .ticket-table tr:hover {
+            background-color: #f9f7f0;
+        }
+
+        .ticket-link {
+            color: var(--primary-red);
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px dotted var(--primary-red);
+            transition: all 0.3s;
+        }
+
+        .ticket-link:hover {
+            color: var(--accent-gold);
+            border-bottom-style: solid;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .artist-news-card {
+            background: #fff;
+            border: 1px solid #e0dcd0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .artist-news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(142, 0, 0, 0.15);
+            border-color: var(--primary-red);
+        }
+
+        .artist-header {
+            height: 120px;
+            background: var(--primary-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .artist-header::after {
+            content: '京韵';
+            position: absolute;
+            font-family: 'Ma Shan Zheng';
+            font-size: 80px;
+            color: rgba(255,255,255,0.1);
+            right: -10px;
+            bottom: -20px;
+            transform: rotate(-10deg);
+        }
+
+        .artist-name {
+            font-family: 'Ma Shan Zheng';
+            font-size: 32px;
+            z-index: 1;
+        }
+
+        .artist-role {
+            position: absolute;
+            bottom: 10px;
+            left: 15px;
+            font-size: 12px;
+            background: var(--accent-gold);
+            padding: 2px 8px;
+            border-radius: 4px;
+            z-index: 1;
+        }
+
+        .artist-content {
+            padding: 20px;
+        }
+
+        .artist-summary {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .read-more {
+            color: var(--primary-red);
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .read-more::after {
+            content: '→';
+            margin-left: 5px;
+            transition: margin 0.3s;
+        }
+        
+        .artist-news-card:hover .read-more::after { margin-left: 10px; }
+
+        .detail-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-paper);
+            z-index: 1000;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-overlay.open {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .detail-header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid #ddd;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .back-btn {
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--primary-red);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--primary-red);
+            padding: 8px 20px;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-red);
+            color: #fff;
+        }
+
+        .detail-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px 60px 20px;
+            background: #fff;
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
+            min-height: 100%;
+        }
+
+        .detail-title-box {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px dashed var(--accent-gold);
+            margin-bottom: 30px;
+        }
+
+        .detail-name {
+            font-family: 'Ma Shan Zheng';
+            font-size: 48px;
+            color: var(--primary-red);
+            margin: 0;
+        }
+
+        .detail-role {
+            font-size: 18px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .detail-section-title {
+            font-family: 'ZCOOL XiaoWei';
+            font-size: 24px;
+            color: var(--text-dark);
+            border-left: 5px solid var(--primary-red);
+            padding-left: 15px;
+            margin: 40px 0 20px 0;
+            background: #f9f9f9;
+            padding: 10px 15px;
+        }
+
+        .detail-text {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #444;
+            text-align: justify;
+        }
+
+        .detail-links a {
+            display: block;
+            padding: 12px;
+            background: #f8f8f8;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .detail-links a:hover {
+            border-color: var(--accent-gold);
+            background: #fffdf0;
+            color: var(--primary-red);
+        }
+        
+        .detail-links a::before {
+            content: '▶';
+            color: var(--accent-gold);
+            margin-right: 10px;
+            font-size: 12px;
+        }
+
+        .content-block {
+            background: #fff;
+            padding: 40px;
+            margin-bottom: 40px;
+            border-radius: 4px;
+            border: 1px solid #e0dcd0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            line-height: 1.8;
+            font-size: 18px;
+            text-align: justify;
+        }
+
+        .content-block h3 {
+            color: var(--primary-red);
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 24px;
+            border-left: 4px solid var(--accent-gold);
+            padding-left: 15px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .content-block p {
+            margin-bottom: 20px;
+            text-indent: 2em;
+        }
+        
+        .masters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .master-card { background: #fdfdfb; border: 1px solid var(--accent-gold); padding: 25px; border-radius: 8px; transition: transform 0.3s; position: relative; overflow: hidden; }
+        .master-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(142, 0, 0, 0.08); }
+        .master-card::before { content: '名家'; position: absolute; top: -10px; right: -10px; font-family: 'Ma Shan Zheng'; font-size: 60px; color: rgba(212, 175, 55, 0.1); z-index: 0; }
+        .master-name { font-family: 'Ma Shan Zheng'; font-size: 26px; color: var(--primary-red); margin-bottom: 5px; position: relative; z-index: 1; }
+        .master-life { font-size: 14px; color: var(--accent-gold); margin-bottom: 15px; font-weight: bold; position: relative; z-index: 1; }
+        .master-desc { font-size: 15px; color: #555; line-height: 1.6; position: relative; z-index: 1; }
+
+        .history-timeline { position: relative; padding: 20px 0; }
+        .history-timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--primary-red); transform: translateX(-50%); }
+        .timeline-item { margin-bottom: 30px; position: relative; width: 50%; cursor: pointer; }
+        .timeline-item:nth-child(odd) { left: 0; padding-right: 40px; text-align: right; }
+        .timeline-item:nth-child(even) { left: 50%; padding-left: 40px; text-align: left; }
+        .timeline-dot { position: absolute; top: 5px; width: 20px; height: 20px; background: var(--bg-paper); border: 4px solid var(--primary-red); border-radius: 50%; z-index: 2; transition: transform 0.3s; }
+        .timeline-year { font-family: 'Ma Shan Zheng'; font-size: 28px; color: var(--primary-red); margin-bottom: 5px; }
+        .timeline-item:nth-child(odd) .timeline-dot { right: -14px; }
+        .timeline-item:nth-child(even) .timeline-dot { left: -14px; }
+        .timeline-desc { display: none; margin-top: 10px; background: #fff; padding: 15px; border: 1px solid #ccc; text-align: justify; }
+        .timeline-item.open .timeline-desc { display: block; }
+        .timeline-hint { font-size: 12px; color: #999; margin-bottom: 10px; display: block; opacity: 0.8; }
+        
+        .music-item { display: flex; background: #fff; border: 1px solid #e0dcd0; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .music-item:nth-child(even) { flex-direction: row-reverse; }
+        .music-visual { flex: 1; background: #222; min-height: 250px; position: relative; }
+        .music-info { flex: 1; padding: 30px; display: flex; flex-direction: column; justify-content: center; }
+        .music-title { font-family: 'Ma Shan Zheng'; font-size: 32px; color: var(--primary-red); margin-bottom: 10px; }
+        .music-artist { color: var(--accent-gold); font-weight: bold; margin-bottom: 20px; font-size: 16px; }
+        .music-desc { color: #555; line-height: 1.8; margin-bottom: 30px; text-align: justify; }
+        .player-mock { width: 100%; height: 100%; background: #333; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; }
+        
+        .game-wrapper { width: 100%; height: 600px; background: #000; border: 10px solid var(--primary-red); border-radius: 8px; position: relative; overflow: hidden; }
+        .game-instruction { text-align: center; margin-bottom: 20px; color: var(--text-light); background: rgba(212, 175, 55, 0.1); padding: 10px; border-radius: 4px; }
+        
+        footer { background: #2c2c2c; color: #888; text-align: center; padding: 40px 0; margin-top: 60px; border-top: 4px solid var(--primary-red); }
+
+        .ink-text { font-family: 'Ma Shan Zheng', cursive; }
     </style>
-  <script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@18.3.1",
-    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime?external=react",
-    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client?external=react",
-    "react-dom": "https://esm.sh/react-dom@18.3.1?external=react",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
     "three": "https://esm.sh/three@0.167.1",
     "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.17.6?external=react,react-dom,three",
     "@react-three/drei": "https://esm.sh/@react-three/drei@9.112.0?external=react,react-dom,three,@react-three/fiber",
     "@mediapipe/tasks-vision": "https://esm.run/@mediapipe/tasks-vision@0.10.9",
     "lucide-react": "https://esm.sh/lucide-react@0.436.0?external=react",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0"
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
 </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<body>
+
+<div id="artist-detail-overlay" class="detail-overlay">
+    <div class="detail-header">
+        <div class="logo" style="font-size: 24px;">艺术家动态详情</div>
+        <div class="back-btn" onclick="closeDetail()">
+            <span>✕ 返回首页</span>
+        </div>
+    </div>
+    <div class="detail-container">
+        <div id="detail-content-placeholder"></div>
+    </div>
+</div>
+
+<header>
+    <a href="#" class="logo">京韵·记忆 <span>Jingyun Memory</span></a>
+    <nav>
+        <ul>
+            <li><a href="#" onclick="showSection('news', this)" class="active">资讯动态</a></li>
+            <li><a href="#" onclick="showSection('intro', this)">艺术简介</a></li>
+            <li><a href="#" onclick="showSection('appreciation', this)">乐曲鉴赏</a></li>
+            <li><a href="#" onclick="showSection('interactive', this)">互动体验</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="container">
+    <div id="news" class="section active">
+        <div class="section-header">
+            <h2>曲艺新声</h2>
+            <p>Updates & Performances</p>
+        </div>
+        <h3 class="sub-header">近期演出排期</h3>
+        <div class="ticket-table-container">
+            <table class="ticket-table">
+                <thead>
+                    <tr>
+                        <th width="20%">日期</th>
+                        <th width="40%">演出名称</th>
+                        <th width="20%">地点</th>
+                        <th width="20%">团体</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     <tr><td>2026-02-19</td><td><a href="http://www.tjyy8.com/show/detail/10055" target="_blank" class="ticket-link">艺苑芬芳 · 京韵大鼓专场</a></td><td>天津·中国大戏院</td><td>天津市曲艺团</td></tr>
+                     <tr><td>2025-12-27</td><td><a href="https://www.tjyy8.com/show/detail/10111" target="_blank" class="ticket-link">红楼梦中曲 · 露泪缘</a></td><td>天津·中国大戏院</td><td>天津市曲艺团</td></tr>
+                     <tr><td>2025-12-27</td><td><a href="https://m.damai.cn/shows/item.html?itemId=997262655678" target="_blank" class="ticket-link">“升平雅乐”德云鼓曲社 · 宁河站</a></td><td>天津·芦台大剧院</td><td>德云鼓曲社</td></tr>
+                     <tr><td>2025-12-31</td><td><a href="https://m.damai.cn" target="_blank" class="ticket-link">“升平雅乐”2025跨年曲艺专场</a></td><td>济南·山东剧院</td><td>德云鼓曲社</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <h3 class="sub-header">艺术家最新动态</h3>
+        <div class="news-grid" id="news-grid"></div>
+    </div>
+
+    <div id="intro" class="section">
+        <div class="section-header">
+            <h2>艺苑奇葩</h2>
+            <p>Introduction & History</p>
+        </div>
+        <div class="content-block">
+            <h3>京韵大鼓简介</h3>
+            <p>京韵大鼓是由河北省沧州、河间一带流行的<strong>木板大鼓</strong>发展而来，形成于京津两地。由刘宝全改以北京的语音声调来吐字发音，吸收石韵书、马头调和京剧的一些唱法，创制新腔，属于鼓词类曲艺音乐。</p>
+        </div>
+        <div class="content-block">
+            <h3>四大名家</h3>
+            <div class="masters-grid">
+                <div class="master-card"><div class="master-name">刘宝全</div><div class="master-life">(1869-1942)</div><div class="master-desc">被誉为“鼓王”，创立了以雄壮、浑厚为特征的刘派。</div></div>
+                <div class="master-card"><div class="master-name">白云鹏</div><div class="master-life">(1874-1952)</div><div class="master-desc">白派创始人，吐字清晰、韵味醇厚。</div></div>
+                <div class="master-card"><div class="master-name">张小轩</div><div class="master-life">(1880-1960)</div><div class="master-desc">张派创始人之一，豪放、气势磅礴。</div></div>
+                <div class="master-card"><div class="master-name">骆玉笙</div><div class="master-life">(1914-2002)</div><div class="master-desc">一代宗师，代表作《重整河山待后生》。</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="appreciation" class="section">
+        <div class="section-header">
+            <h2>余音绕梁</h2>
+            <p>Masterpieces Appreciation</p>
+        </div>
+        <div class="music-list" id="music-list"></div>
+    </div>
+
+    <div id="interactive" class="section">
+        <div class="section-header">
+            <h2>击鼓鸣板</h2>
+            <p>Interactive Experience</p>
+        </div>
+        <div class="game-instruction">
+            <p>🎮 <strong>游玩指南：</strong> 上传您的背景曲目，点击“开场”。使用摄像头跟踪您的双手，挥动鼓槌敲击周围的六合鼓阵！</p>
+        </div>
+        <div class="game-wrapper">
+            <!-- React mount point -->
+            <div id="root"></div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 京韵·记忆 | 弘扬中华优秀传统文化</p>
+</footer>
+
+<script>
+    const artistData = {
+        "liuchunai": { name: "刘春爱", role: "骆派传人", summary: "1949年出生，骆玉笙亲传弟子。近期逐字逐句指导弟子陈钰，并出席崔桂平收徒仪式，强调传承初心。", events: ["2025年7月18日：给弟子陈钰讲授骆派京韵大鼓课程。", "2025年：参与骆派京韵大鼓第三代传人崔桂平收徒仪式。"] },
+        "zhangwanyi": { name: "张婉怡", role: "德云社青年演员", summary: "被称为“小赵玉蓉”，凭借德云社平台传播传统鼓曲。2025年高频登台，参演《双玉听琴》等。", events: ["2025年全年高频登台：包括12月13日三庆园晚场《双玉听琴》等。"] },
+        "xiayan": { name: "夏 炎", role: "刘派青年传人", summary: "天津市曲艺团副团长。参与策划“说唱津门”专场，与冯欣蕊合作《繁花似锦》。", events: ["2025年12月17日：在第七届“和平杯”颁奖典礼表演《繁花似锦》。"] }
+    };
+
+    function showSection(sectionId, linkEl) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+        document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
+        linkEl.classList.add('active');
+        window.dispatchEvent(new Event('resize'));
+    }
+
+    function openDetail(id) {
+        const data = artistData[id];
+        const placeholder = document.getElementById('detail-content-placeholder');
+        placeholder.innerHTML = `<div class="detail-title-box"><h1 class="detail-name">${data.name}</h1><div class="detail-role">${data.role}</div></div><div class="detail-section-title">动态概要</div><div class="detail-text">${data.summary}</div><div class="detail-section-title">近期活动</div><ul>${data.events.map(e => `<li>${e}</li>`).join('')}</ul>`;
+        const overlay = document.getElementById('artist-detail-overlay');
+        overlay.style.display = 'flex';
+        overlay.offsetHeight; overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetail() {
+        const overlay = document.getElementById('artist-detail-overlay');
+        overlay.classList.remove('open');
+        setTimeout(() => { overlay.style.display = 'none'; document.body.style.overflow = ''; }, 400);
+    }
+
+    const grid = document.getElementById('news-grid');
+    Object.keys(artistData).forEach(id => {
+        const data = artistData[id];
+        grid.innerHTML += `<div class="artist-news-card" onclick="openDetail('${id}')"><div class="artist-header"><div class="artist-name">${data.name}</div><div class="artist-role">${data.role}</div></div><div class="artist-content"><p class="artist-summary">${data.summary}</p><div class="read-more">点击详情</div></div></div>`;
+    });
+
+    const musicList = document.getElementById('music-list');
+    const tracks = [
+        { title: "丑末寅初", artist: "骆派（骆玉笙）", desc: "写景抒情小段，描写古代渔、樵、耕、读。节奏轻快，韵味悠长。" },
+        { title: "剑阁闻铃", artist: "骆派（骆玉笙）", desc: "凄楚悲凉的巅峰之作，讲述唐明皇入蜀途中对贵妃的深切思念。" }
+    ];
+    tracks.forEach(t => {
+        musicList.innerHTML += `<div class="music-item"><div class="music-visual"><div class="player-mock">🎵</div></div><div class="music-info"><div class="music-title">${t.title}</div><div class="music-artist">${t.artist}</div><div class="music-desc">${t.desc}</div></div></div>`;
+    });
+</script>
+<script type="module" src="./index.tsx"></script>
+</body>
 </html>
