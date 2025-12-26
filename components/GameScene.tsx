@@ -1,4 +1,3 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -67,16 +66,19 @@ const HexagonalTrack = () => {
     );
 };
 
+const TextureMesh: React.FC<{ url: string }> = ({ url }) => {
+    const texture = useTexture(url);
+    return (
+        <mesh position={[0, 10, -50]}>
+            <planeGeometry args={[100, 56.25]} />
+            <meshBasicMaterial map={texture} transparent opacity={0.9} />
+        </mesh>
+    );
+};
+
 const BackgroundLayer: React.FC<{ url: string | null }> = ({ url }) => {
-    const texture = url ? useTexture(url) : null;
-    
-    if (texture) {
-        return (
-            <mesh position={[0, 10, -50]}>
-                <planeGeometry args={[100, 56.25]} />
-                <meshBasicMaterial map={texture} transparent opacity={0.9} />
-            </mesh>
-        );
+    if (url) {
+        return <TextureMesh url={url} />;
     }
 
     return (
